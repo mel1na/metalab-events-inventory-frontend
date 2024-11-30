@@ -1,0 +1,1 @@
+# metalab-events-inventory-frontend

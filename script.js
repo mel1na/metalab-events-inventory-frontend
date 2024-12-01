@@ -30,9 +30,9 @@ const makePurchaseInput = (id, name) => {
     let elem = document.createElement('tr');
     elem.classList.add('purchase-input');
     let itemName = elem.appendChild(document.createElement('td')).appendChild(document.createElement('span'));
-    let addBtn   = elem.appendChild(document.createElement('td')).appendChild(document.createElement('button'));
-    let itemQty  = elem.appendChild(document.createElement('td')).appendChild(document.createElement('span'));
     let remBtn   = elem.appendChild(document.createElement('td')).appendChild(document.createElement('button'));
+    let itemQty  = elem.appendChild(document.createElement('td')).appendChild(document.createElement('span'));
+    let addBtn   = elem.appendChild(document.createElement('td')).appendChild(document.createElement('button'));
     let set0Btn  = elem.appendChild(document.createElement('td')).appendChild(document.createElement('button'));
     itemName.innerText = name;
     itemQty.innerText = '0';

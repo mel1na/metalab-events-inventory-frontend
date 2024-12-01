@@ -111,13 +111,14 @@ const fetchPurchases = async () => fetch(`${baseURL}/api/purchases`).then(r => r
     // the way this api works surely won't lead to issues later down the line (foreshadowing)
     statisticsData.length = 0;
     statisticsLabels.length = 0;
-    r.data.forEach(purchase =>
-        purchase.items.forEach(item => {
-            if (!statisticsLabels[item.id]) statisticsLabels[item.id] = item.name;
-            if (!statisticsData[item.id]) statisticsData[item.id] = item.quantity;
-            else statisticsData[item.id] += item.quantity;
-        })
-    );
+    r.data.forEach(purchase => {
+        if (purchase?.items)
+            purchase.items.forEach(item => {
+                if (!statisticsLabels[item.id]) statisticsLabels[item.id] = item.name;
+                if (!statisticsData[item.id]) statisticsData[item.id] = item.quantity;
+                else statisticsData[item.id] += item.quantity;
+            });
+    });
     statisticsChart.update();
 }).catch();
 

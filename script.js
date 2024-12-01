@@ -72,7 +72,7 @@ const addPurchase = async (paymentType) => {
     document.getElementById('tip-qty').value = '';
     updateTotals();
 
-    let promise = fetch(`${baseURL}`, {
+    let promise = fetch(`${baseURL}/api/purchases`, {
         method: 'post',
         headers: {
             'Accept': 'application/json',

@@ -67,7 +67,7 @@ const addPurchase = async (paymentType) => {
     for (let i = 0; i < order.length; i++)
         if (order[i])
             items.push({ id: i, quantity: order[i] });
-    if (items == null) { return; }
+    if (!Array.isArray(items) || !items.length) { return; }
     
     order = [];
     qtyElements.forEach(e => e.innerText = '0');

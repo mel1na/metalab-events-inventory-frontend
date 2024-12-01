@@ -132,10 +132,8 @@ const fetchItems = async () => fetch(`${baseURL}/api/items`)
             });
         }
     });
-    document.querySelector('#purchase-inputs>table>tbody').replaceChildren(items);
+    document.querySelector('#purchase-inputs>table>tbody').replaceChildren(...items);
 }).catch();
-
-
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchItems();

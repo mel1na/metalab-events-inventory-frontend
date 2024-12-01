@@ -62,6 +62,7 @@ const makePurchaseInput = (id, name) => {
 };
 
 const addPurchase = async (paymentType) => {
+    let tip = parseFloat(document.getElementById('tip-qty').value) || undefined;
     let items = [];
     for (let i = 0; i < order.length; i++)
         if (order[i])
@@ -81,8 +82,9 @@ const addPurchase = async (paymentType) => {
         },
         body: JSON.stringify({
             items: items,
-            tip: parseFloat(document.getElementById('tip-qty').value) || undefined,
-            payment_type: paymentType
+            tip: tip,
+            payment_type: paymentType,
+            a: 'b'
         })
     }).then(r => r.json()).catch();
     setTimeout(fetchPurchases, 200);

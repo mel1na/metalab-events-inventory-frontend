@@ -36,14 +36,16 @@ purchase create request:POST
     { "id": 1, "quantity": 5},
     { "id": 2, "quantity": 5}
   ],
-  "payment_type": "card"
+  "payment_type": "card",
+  "tip": 1
 }
 {
   "items": [
     { "id": 1, "quantity": 5 },
     { "id": 2, "quantity": 5 }
   ],
-  "payment_type": "cash"
+  "payment_type": "cash",
+  "tip": 1
 }
 
 purchase create response:

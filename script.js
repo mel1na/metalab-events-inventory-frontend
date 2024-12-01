@@ -214,30 +214,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     fetchItems();
     fetchPurchases();
-
-
-
-
-
-
-
-
-    prices = [ 1, 2, 3, 5, 5, 5, 5, 5, 5, 5, 50, 0.1, 1 ];
-
-    document.querySelector('#purchase-inputs>table>tbody').appendChild(makePurchaseInput(1, 'meow'));
-    document.querySelector('#purchase-inputs>table>tbody').appendChild(makePurchaseInput(2, ':3'));
-    document.querySelector('#purchase-inputs>table>tbody').appendChild(makePurchaseInput(3, 'nyaa'));
-    document.querySelector('#purchase-inputs>table>tbody').appendChild(makePurchaseInput(4, 'nyaa 1'));
-    document.querySelector('#purchase-inputs>table>tbody').appendChild(makePurchaseInput(5, 'nyaa 2'));
-    document.querySelector('#purchase-inputs>table>tbody').appendChild(makePurchaseInput(6, 'nyaa 3'));
-    document.querySelector('#purchase-inputs>table>tbody').appendChild(makePurchaseInput(7, 'nyaa 4'));
-    document.querySelector('#purchase-inputs>table>tbody').appendChild(makePurchaseInput(8, 'nyaa 5'));
-    document.querySelector('#purchase-inputs>table>tbody').appendChild(makePurchaseInput(9, 'nyaa 6'));
-    document.querySelector('#purchase-inputs>table>tbody').appendChild(makePurchaseInput(10, 'nyaa 7'));
-    document.querySelector('#purchase-inputs>table>tbody').appendChild(makePurchaseInput(11, 'nyaa 8'));
-    document.querySelector('#purchase-inputs>table>tbody').appendChild(makePurchaseInput(12, 'nyaa 9'));
-
-    [ 'meow', ':3', 'nyaa', 'nyaa 1', 'nyaa 2', 'nyaa 3', 'nyaa 4', 'nyaa 5', 'nyaa 6', 'nyaa 7', 'nyaa 8', 'nyaa 9' ].forEach(l => statisticsLabels.push(l));
-    [ 2, 3, 5, 5, 5, 5, 5, 5, 5, 50, 9, 7 ].forEach(v => statisticsData.push(v));
-    statisticsChart.update();
 });

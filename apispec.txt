@@ -31,8 +31,20 @@ items list:
 
 purchase create request:POST
 
-{"items":[{"id":1,"quantity":5},{"id":2,"quantity":5}],"payment_type":"card"}
-{"items":[{"id":1,"quantity":5},{"id":2,"quantity":5}],"payment_type":"cash"}
+{
+  "items": [
+    { "id": 1, "quantity": 5},
+    { "id": 2, "quantity": 5}
+  ],
+  "payment_type": "card"
+}
+{
+  "items": [
+    { "id": 1, "quantity": 5 },
+    { "id": 2, "quantity": 5 }
+  ],
+  "payment_type": "cash"
+}
 
 purchase create response:
 

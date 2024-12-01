@@ -94,6 +94,12 @@ hr {
                 pointer-events: none;
             }
         }
+
+        & td:last-child {
+            width: 2.5rem;
+            padding-left: 2%;
+            align-content: end;
+        }
     }
 }
 

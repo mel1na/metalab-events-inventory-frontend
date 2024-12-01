@@ -74,7 +74,7 @@ hr {
 #purchase-inputs {
     grid-column: 1;
     overflow-wrap: anywhere;
-    overflow-y: scroll;
+    overflow-y: auto;
     scroll-behavior: smooth;
     scroll-snap-type: y mandatory;
 

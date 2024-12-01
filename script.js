@@ -1,4 +1,10 @@
 const baseURL = 'http://localhost:8080';
+const foregroundColor = '#ffefef';
+
+let statisticsChart;
+let statisticsLabels = [];
+let statisticsData = [];
+
 
 let qtyElements = [];
 let prices = [];
@@ -57,7 +63,7 @@ const addPurchase = async (paymentType) => {
     order = [];
     qtyElements.forEach(e => e.innerText = '0');
 
-    return fetch(`${baseURL}`, {
+    let promise = fetch(`${baseURL}`, {
         method: 'post',
         headers: {
             'Accept': 'application/json',
@@ -68,6 +74,8 @@ const addPurchase = async (paymentType) => {
             'payment_type': paymentType
         })
     }).then(r => r.json()).catch();
+    setTimeout(fetchPurchases, 200);
+    return promise;
 }
 
 // frontend doesn't need to support this
@@ -89,9 +97,17 @@ const addPurchase = async (paymentType) => {
 // }).catch();
   
 const fetchPurchases = async () => fetch(`${baseURL}/api/purchases`).then(r => r.json()).then(r => {
-    r.data.forEach(purchase => { //for each entry under data
-        
-    });
+    // the way this api works surely won't lead to issues later down the line (foreshadowing)
+    statisticsData.length = 0;
+    statisticsLabels.length = 0;
+    r.data.forEach(purchase =>
+        purchase.items.forEach(item => {
+            if (!statisticsLabels[item.id]) statisticsLabels[item.id] = item.name;
+            if (!statisticsData[item.id]) statisticsData[item.id] = item.quantity;
+            else statisticsData[item.id] += item.quantity;
+        })
+    );
+    statisticsChart.update();
 }).catch();
 
 const fetchItems = async () => fetch(`${baseURL}/api/items`)
@@ -136,6 +152,67 @@ const fetchItems = async () => fetch(`${baseURL}/api/items`)
 }).catch();
 
 document.addEventListener('DOMContentLoaded', () => {
+    Chart.register(ChartDataLabels);
+    Chart.defaults.font.size = 24;
+    statisticsChart = new Chart(
+        document.getElementById('purchase-statistics-canvas'),
+        {
+            type: 'bar',
+            options: {
+                animation: true,
+                aspectRatio: 3,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            display: false
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: foregroundColor
+                        }
+                    }
+                },
+                layout: {
+                    padding: 15
+                },
+                plugins: {
+                    legend: {
+                        display: false,
+                        position: 'bottom',
+                        labels: {
+                            color: foregroundColor,
+                            font: {
+                                size: 24
+                            }
+                        }
+                    },
+                    tooltip: {
+                        enabled: false
+                    },
+                    datalabels: {
+                        formatter: (value, ctx) => value,
+                        color: foregroundColor,
+                        font: {
+                            size: 24
+                        }
+                    }
+                }
+            },
+            data: {
+                labels: statisticsLabels,
+                datasets: [
+                    {
+                        data: statisticsData,
+                        backgroundColor: [ '#BF307A', '#309FBF', '#30BF33', '#30BF88', '#7030BF', '#BF3098', '#BF5230', '#309FBF', '#BF3095', '#30BFAD', '#3D30BF', '#4BBF30', '#BF3041', '#30BF69', '#95BF30', '#BF4E30', '#30B0BF', '#BF30B7', '#303DBF', '#30BF98' ],
+                        borderColor: foregroundColor
+                    }
+                ]
+            }
+        }
+    );
+
     fetchItems();
     fetchPurchases();
 
@@ -179,4 +256,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // document.querySelector('#purchase-inputs>table>tbody').appendChild(makePurchaseInput(10, 'nyaa 7'));
     // document.querySelector('#purchase-inputs>table>tbody').appendChild(makePurchaseInput(11, 'nyaa 8'));
     // document.querySelector('#purchase-inputs>table>tbody').appendChild(makePurchaseInput(12, 'nyaa 9'));
+
+    // [ 'meow', ':3', 'nyaa', 'nyaa 1', 'nyaa 2', 'nyaa 3', 'nyaa 4', 'nyaa 5', 'nyaa 6', 'nyaa 7', 'nyaa 8', 'nyaa 9' ].forEach(l => statisticsLabels.push(l));
+    // [ 2, 3, 5, 5, 5, 5, 5, 5, 5, 50, 9, 7 ].forEach(v => statisticsData.push(v));
+    // statisticsChart.update();
 });

@@ -83,8 +83,7 @@ const addPurchase = async (paymentType) => {
         body: JSON.stringify({
             items: items,
             tip: tip,
-            payment_type: paymentType,
-            a: 'b'
+            payment_type: paymentType
         })
     }).then(r => r.json()).catch();
     setTimeout(fetchPurchases, 200);

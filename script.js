@@ -5,19 +5,26 @@ let statisticsChart;
 let statisticsLabels = [];
 let statisticsData = [];
 
+let tipInputsPending = 0;
 
 let qtyElements = [];
 let prices = [];
-let tipID = 0;
 let order = [];
 
 const updateTotals = () => {
-    if (!order[tipID]) order[tipID] = 0;
-    let total = order.reduce((c, v, i) => c + v * prices[i], 0);
-    let subtotal = total - order[tipID] * prices[tipID];
+    let tip = parseFloat(document.getElementById('tip-qty').value) || 0;
+    let subtotal = Math.round((order.reduce((c, v, i) => c + v * prices[i], 0)) * 100) / 100;
+    let total = Math.round((subtotal + tip) * 100) / 100;
     document.getElementById('subtotal').innerText = `Subtotal: ${subtotal}€`;
     document.getElementById('total').innerText = `Total: ${total}€`;
 };
+
+const roundTip = () => {
+    let subtotal = order.reduce((c, v, i) => c + v * prices[i], 0);
+    let tip = Math.round((Math.ceil(subtotal) - subtotal) * 100) / 100;
+    document.getElementById('tip-qty').value = tip || '';
+    updateTotals();
+}
 
 const makePurchaseInput = (id, name) => {
     let elem = document.createElement('tr');
@@ -58,10 +65,11 @@ const addPurchase = async (paymentType) => {
     let items = [];
     for (let i = 0; i < order.length; i++)
         if (order[i])
-            items.push({ 'id': i, 'quantity': order[i] });
+            items.push({ id: i, quantity: order[i] });
     
     order = [];
     qtyElements.forEach(e => e.innerText = '0');
+    updateTotals();
 
     let promise = fetch(`${baseURL}`, {
         method: 'post',
@@ -70,8 +78,9 @@ const addPurchase = async (paymentType) => {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            'items': items,
-            'payment_type': paymentType
+            items: items,
+            tip: parseFloat(document.getElementById('tip-qty').value) || undefined,
+            payment_type: paymentType
         })
     }).then(r => r.json()).catch();
     setTimeout(fetchPurchases, 200);
@@ -118,35 +127,7 @@ const fetchItems = async () => fetch(`${baseURL}/api/items`)
     prices = [];
     r.data.forEach(item => {
         prices[item.id] = item.price;
-        if (item.name !== 'Tip')
-            items.push(makePurchaseInput(item.id, `${item.name} ${item.price}€`))
-        else {
-            tipID = item.id;
-            document.getElementById('tip-inc5').addEventListener('click', () => {
-                if (!order[tipID]) order[tipID] = 0;
-                order[tipID] += 5;
-                document.getElementById('tip-qty').innerText = order[tipID];
-                updateTotals();
-            });
-            document.getElementById('tip-inc').addEventListener('click', () => {
-                if (!order[tipID]) order[tipID] = 0;
-                order[tipID]++;
-                document.getElementById('tip-qty').innerText = order[tipID];
-                updateTotals();
-            });
-            document.getElementById('tip-dec').addEventListener('click', () => {
-                if (!order[tipID]) order[tipID] = 0;
-                if (order[tipID] <= 0) return;
-                order[tipID]--;
-                document.getElementById('tip-qty').innerText = order[tipID];
-                updateTotals();
-            });
-            document.getElementById('tip-set0').addEventListener('click', () => {
-                order[tipID] = 0;
-                document.getElementById('tip-qty').innerText = order[tipID];
-                updateTotals();
-            });
-        }
+        items.push(makePurchaseInput(item.id, `${item.name} ${item.price}€`));
     });
     document.querySelector('#purchase-inputs>table>tbody').replaceChildren(...items);
 }).catch();
@@ -213,36 +194,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     );
 
+    document.getElementById('tip-qty').value = '';
+    document.getElementById('tip-qty').addEventListener('input', () => {
+        tipInputsPending++;
+        setTimeout(() => {
+            tipInputsPending--;
+            if (tipInputsPending == 0)
+                updateTotals();
+        }, 200);
+    });
+
+    document.getElementById('tip-round').addEventListener('click', () => {
+        if (!order[tipID]) order[tipID] = 0;
+        order[tipID] += 5;
+        document.getElementById('tip-qty').innerText = order[tipID];
+        updateTotals();
+    });
+
     fetchItems();
     fetchPurchases();
 
-    // prices = [ 1, 2, 3, 5, 5, 5, 5, 5, 5, 5, 50, 9, 7 ];
 
-    // tipID = 0;
-    // document.getElementById('tip-inc5').addEventListener('click', () => {
-    //     if (!order[tipID]) order[tipID] = 0;
-    //     order[tipID] += 5;
-    //     document.getElementById('tip-qty').innerText = order[tipID];
-    //     updateTotals();
-    // });
-    // document.getElementById('tip-inc').addEventListener('click', () => {
-    //     if (!order[tipID]) order[tipID] = 0;
-    //     order[tipID]++;
-    //     document.getElementById('tip-qty').innerText = order[tipID];
-    //     updateTotals();
-    // });
-    // document.getElementById('tip-dec').addEventListener('click', () => {
-    //     if (!order[tipID]) order[tipID] = 0;
-    //     if (order[tipID] <= 0) return;
-    //     order[tipID]--;
-    //     document.getElementById('tip-qty').innerText = order[tipID];
-    //     updateTotals();
-    // });
-    // document.getElementById('tip-set0').addEventListener('click', () => {
-    //     order[tipID] = 0;
-    //     document.getElementById('tip-qty').innerText = order[tipID];
-    //     updateTotals();
-    // });
+
+
+
+
+
+
+    // prices = [ 1, 2, 3, 5, 5, 5, 5, 5, 5, 5, 50, 0.1, 1 ];
 
     // document.querySelector('#purchase-inputs>table>tbody').appendChild(makePurchaseInput(1, 'meow'));
     // document.querySelector('#purchase-inputs>table>tbody').appendChild(makePurchaseInput(2, ':3'));

@@ -24,16 +24,10 @@
             <div class="spacer"></div>
             <span id="subtotal">Subtotal: 0€</span>
             <div class="align-horizontal mt-3">
-                <div class="align-horizontal spacer">
-                    <span>Add Tip?</span>
-                    <div class="spacer"></div>
-                    <button id="tip-inc5">+5</button>
-                    <button id="tip-inc">+</button>
-                    <span id="tip-qty">0</span>
-                    <button id="tip-dec">-</button>
-                    <button id="tip-set0">X</button>
-                </div>
+                <span>Add Tip?</span>
                 <div class="spacer"></div>
+                <input type="text" inputmode="decimal" pattern="\d*([.,]\d{1,2})?" name="tip-quantity" id="tip-qty" min="0" step="0.01" value="" placeholder="0">
+                <button id="tip-round" onclick="roundTip()">Round to next full €</button>
             </div>
             <hr>
             <span id="total">Total: 0€</span>

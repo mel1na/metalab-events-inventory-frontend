@@ -30,6 +30,15 @@ button {
     }
 }
 
+input {
+    border: 2px solid var(--foreground);
+    border-radius: 10px;
+    padding: 8px;
+    outline: none;
+    min-height: 1.4em;
+    min-width: 1em;
+}
+
 hr {
     margin: 1.5% -1%;
 }
@@ -102,8 +111,13 @@ hr {
 }
 
 #tip-qty {
-    width: 2rem;
+    width: 30%;
     text-align: center;
+    margin: 0 2%;
+}
+
+#tip-round {
+    width: 50%;
 }
 
 .purchase-buttons {

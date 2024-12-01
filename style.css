@@ -52,17 +52,13 @@ hr {
     display: grid;
     grid-template-rows: 1fr 2fr;
     grid-template-columns: 3fr 4fr 2fr;
-    height: 100vh;
+    height: 100svh;
     width: 100vw;
 }
 
 #purchase-statistics {
     grid-row: 1;
     grid-column: 1 / 4;
-    align-items: center;
-    align-content: center;
-    justify-content: center;
-    vertical-align: center;
 }
 
 #purchase-inputs, #purchase-confirm, #page-refresh {
@@ -173,5 +169,5 @@ hr {
 }
 
 #purchase-statistics-canvas {
-    max-height: 95%;
+    max-height: 100%;
 }

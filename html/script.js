@@ -1,4 +1,4 @@
-const baseURL = 'http://localhost:8080';
+const baseURL = 'https://metalab-pos.gupper.systems';
 const foregroundColor = '#ffefef';
 
 let statisticsChart;

@@ -5,7 +5,7 @@ function createCookie(name,value,days) {
 		var expires = "; expires="+date.toGMTString();
 	}
 	else var expires = "";
-	document.cookie = name+"="+value+expires+"; path=/; SameSite=Strict; Secure; HttpOnly";
+	document.cookie = name+"="+value+expires+"; path=/; SameSite=Strict; Secure";
 }
 
 function readCookie(name) {

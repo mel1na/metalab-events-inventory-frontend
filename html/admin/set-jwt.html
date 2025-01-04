@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Set Auth JWT</title>
+</head>
+<body>
+    <label for="jwt">Token: </label>
+    <input type="text" id="jwt" name="jwt"><br><br>
+    <button type="button" onclick="createCookie('jwt_token',document.getElementById('jwt').value,1)">Submit cookie</button><br><br>
+    <!--<button type="button" onclick="if (readCookie('jwt_token') == document.getElementById('jwt').value) {alert('tokens match')}">Check cookie</button><br><br>-->
+    <button type="button" onclick="eraseCookie('jwt_token')">Erase cookie</button><br><br>
+    <script src="cookies.js"></script>
+</body>
+</html>

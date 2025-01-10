@@ -1,6 +1,7 @@
 item create request:POST
 
 {"name":"Club Mate","price":3.00}
+header: Authorization: Bearer <token>
 
 item create response:
 
@@ -47,6 +48,7 @@ purchase create request:POST
   "payment_type": "cash",
   "tip": 1
 }
+header: Authorization: Bearer <token>
 
 purchase create response:
 

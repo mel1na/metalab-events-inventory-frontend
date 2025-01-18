@@ -1,4 +1,6 @@
-const baseURL = 'https://metalab-pos.gupper.systems';
+const baseURL = document.location.protocol === 'file:' || document.location.hostname === 'localhost' || document.location.hostname === '127.0.0.1'
+    ? 'http://localhost'
+    : 'https://metalab-pos.gupper.systems';
 const foregroundColor = '#ffefef';
 
 let statisticsChart;

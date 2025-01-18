@@ -2,11 +2,11 @@
     --background: #121216;
     --foreground: #ffefef;
     --primary: #e033cf;
+    --success: #40be3e;
+    --failure: #f15656;
 }
 
 * {
-    margin: 0;
-    padding: 0;
     background-color: var(--background);
     color: var(--foreground);
     font-size: x-large;
@@ -15,13 +15,16 @@
 
 body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
 }
 
 button {
     border: 2px solid var(--foreground);
     border-radius: 10px;
     padding: 8px;
-    margin: 5px;
     min-height: 2em;
     min-width: 2em;
 
@@ -34,7 +37,7 @@ button {
 input {
     border: 2px solid var(--foreground);
     border-radius: 10px;
-    padding: 8px;
+    padding: 8px 16px;
     outline: none;
     min-height: 1.4em;
     min-width: 1em;
@@ -42,6 +45,16 @@ input {
 
 hr {
     margin: 1.5% -1%;
+}
+
+dialog {
+    outline: none;
+    border: 1px solid var(--foreground);
+    border-radius: 10px;
+
+    &::backdrop {
+        backdrop-filter: blur(1px) brightness(75%);
+    }
 }
 
 .d-none {
@@ -54,6 +67,55 @@ hr {
     grid-template-columns: 3fr 4fr 2fr;
     height: 100svh;
     width: 100vw;
+}
+
+.error {
+    border-color: var(--failure);
+}
+
+.purchase-buttons {
+    & > button {
+        padding: 12px;
+        flex-grow: 1;
+        flex-basis: 0;
+    }
+}
+
+.align-vertical {
+    display: flex;
+    flex-direction: column;
+}
+
+.align-horizontal {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.align-right {
+    align-items: right;
+    align-content: end;
+    text-align: right;
+}
+
+.spacer {
+    width: 20px;
+    height: 0.5rem;
+    &[flex] {
+        flex-grow: 1;
+    }
+}
+
+.small {
+    font-size: small;
+}
+
+.mt-3 {
+    margin-top: 3%;
+}
+
+.mt-5 {
+    margin-top: 5%;
 }
 
 #purchase-statistics {
@@ -126,47 +188,10 @@ hr {
     width: 50%;
 }
 
-.purchase-buttons {
-    & > button {
-        padding: 12px;
-        flex-grow: 1;
-        flex-basis: 0;
-    }
-}
-
-.align-vertical {
-    display: flex;
-    flex-direction: column;
-}
-
-.align-horizontal {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-}
-
-.align-right {
-    align-items: right;
-    align-content: end;
-    text-align: right;
-}
-
-.spacer {
-    flex-grow: 1;
-}
-
-.small {
-    font-size: small;
-}
-
-.mt-3 {
-    margin-top: 3%;
-}
-
-.mt-5 {
-    margin-top: 5%;
-}
-
 #purchase-statistics-canvas {
     max-height: 100%;
+}
+
+#auth-prompt > div > * {
+    margin-bottom: 5%;
 }

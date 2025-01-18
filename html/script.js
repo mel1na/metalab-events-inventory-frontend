@@ -1,7 +1,10 @@
+const $ = q => document.querySelector(q);
 const baseURL = document.location.protocol === 'file:' || document.location.hostname === 'localhost' || document.location.hostname === '127.0.0.1'
-    ? 'http://localhost'
+    ? 'http://localhost:8080'
     : 'https://metalab-pos.gupper.systems';
 const foregroundColor = '#ffefef';
+
+let auth = undefined;
 
 let statisticsChart;
 let statisticsLabels = [];
@@ -13,18 +16,66 @@ let qtyElements = [];
 let prices = [];
 let order = [];
 
+const GET = async (path) => fetch(`${baseURL}${path}`, {
+    method: 'GET',
+    headers: {
+        'Accept': 'application/json',
+        'Authorization': auth
+    }
+}).then(r => r.json()).catch();
+
+const POST = async (path, data) => fetch(`${baseURL}${path}`, {
+    method: 'post',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': auth
+        },
+        body: JSON.stringify(data)
+}).then(r => r.json()).catch();
+
+const onLogin = () => {
+    fetchItems();
+    fetchPurchases();
+}
+
+const login = () => {
+    let token = $('#auth-input').value;
+    if (!token.startsWith('Bearer '))
+        token = 'Bearer ' + token;
+    checkAuth(token).then(ok => {
+        if (ok) {
+            auth = token;
+            localStorage.setItem('auth_token', token);
+            $('#auth-prompt').close();
+            onLogin();
+        } else
+            $('#auth-input').classList.add('error');
+    });
+}
+
+const checkAuth = async (token) => {
+    return token === null ? false : fetch(`${baseURL}/api/token/validate`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Authorization': token
+        }
+    }).then(r => r.ok).catch(console.log);
+}
+
 const updateTotals = () => {
-    let tip = parseFloat(document.getElementById('tip-qty').value) || 0;
+    let tip = parseFloat($('#tip-qty').value) || 0;
     let subtotal = Math.round((order.reduce((c, v, i) => c + v * prices[i], 0)) * 100) / 100;
     let total = Math.round((subtotal + tip) * 100) / 100;
-    document.getElementById('subtotal').innerText = `Subtotal: ${subtotal}€`;
-    document.getElementById('total').innerText = `Total: ${total}€`;
+    $('#subtotal').innerText = `Subtotal: ${subtotal}€`;
+    $('#total').innerText = `Total: ${total}€`;
 };
 
 const roundTip = () => {
     let subtotal = order.reduce((c, v, i) => c + v * prices[i], 0);
     let tip = Math.round((Math.ceil(subtotal) - subtotal) * 100) / 100;
-    document.getElementById('tip-qty').value = tip || '';
+    $('#tip-qty').value = tip || '';
     updateTotals();
 }
 
@@ -64,7 +115,7 @@ const makePurchaseInput = (id, name) => {
 };
 
 const addPurchase = async (paymentType) => {
-    let tip = parseFloat(document.getElementById('tip-qty').value) || undefined;
+    let tip = parseFloat($('#tip-qty').value) || undefined;
     let items = [];
     for (let i = 0; i < order.length; i++)
         if (order[i])
@@ -73,44 +124,20 @@ const addPurchase = async (paymentType) => {
     
     order = [];
     qtyElements.forEach(e => e.innerText = '0');
-    document.getElementById('tip-qty').value = '';
+    $('#tip-qty').value = '';
     updateTotals();
 
-    let promise = fetch(`${baseURL}/api/purchases`, {
-        method: 'post',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            items: items,
-            tip: tip,
-            payment_type: paymentType
-        })
-    }).then(r => r.json()).catch();
+    let promise = POST('/api/purchases', {
+        items: items,
+        tip: tip,
+        payment_type: paymentType
+    });
     setTimeout(fetchPurchases, 200);
     return promise;
 }
 
-// frontend doesn't need to support this
-// const createItem = async (name, quantity, price) => fetch(`${baseURL}/api/items`, {
-//     method: 'post',
-//     headers: {
-//         'Accept': 'application/json',
-//         'Content-Type': 'application/json'
-//     },
-    
-//     body: JSON.stringify({
-//       name: name,
-//       quantity: quantity,
-//       price: price
-//     })
-// }).then(r => r.json())
-// .then(r => { 
-//     //append item to local table
-// }).catch();
-  
-const fetchPurchases = async () => fetch(`${baseURL}/api/purchases`).then(r => r.json()).then(r => {
+const fetchPurchases = async () => GET('/api/purchases')
+.then(r => {
     // the way this api works surely won't lead to issues later down the line (foreshadowing)
     statisticsData.length = 0;
     statisticsLabels.length = 0;
@@ -123,10 +150,9 @@ const fetchPurchases = async () => fetch(`${baseURL}/api/purchases`).then(r => r
             });
     });
     statisticsChart.update();
-}).catch();
+});
 
-const fetchItems = async () => fetch(`${baseURL}/api/items`)
-.then(r => r.json())
+const fetchItems = async () => GET('/api/items')
 .then(r => {
     let items = [];
     qtyElements = [];
@@ -135,14 +161,23 @@ const fetchItems = async () => fetch(`${baseURL}/api/items`)
         prices[item.id] = item.price;
         items.push(makePurchaseInput(item.id, `${item.name} ${item.price}€`));
     });
-    document.querySelector('#purchase-inputs>table>tbody').replaceChildren(...items);
-}).catch();
+    $('#purchase-inputs>table>tbody').replaceChildren(...items);
+});
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    let token = localStorage.getItem('auth_token');
+    checkAuth(token).then(ok => {
+        if (!ok) {
+            localStorage.removeItem('auth_token');
+            $('#auth-prompt').showModal();
+        } else onLogin();
+    })
+
+
     Chart.register(ChartDataLabels);
     Chart.defaults.font.size = 24;
     statisticsChart = new Chart(
-        document.getElementById('purchase-statistics-canvas'),
+        $('#purchase-statistics-canvas'),
         {
             type: 'bar',
             options: {
@@ -200,8 +235,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     );
 
-    document.getElementById('tip-qty').value = '';
-    document.getElementById('tip-qty').addEventListener('input', () => {
+    $('#tip-qty').value = '';
+    $('#tip-qty').addEventListener('input', () => {
         tipInputsPending++;
         setTimeout(() => {
             tipInputsPending--;
@@ -210,13 +245,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 200);
     });
 
-    document.getElementById('tip-round').addEventListener('click', () => {
+    $('#tip-round').addEventListener('click', () => {
         if (!order[tipID]) order[tipID] = 0;
         order[tipID] += 5;
-        document.getElementById('tip-qty').innerText = order[tipID];
+        $('#tip-qty').innerText = order[tipID];
         updateTotals();
     });
-
-    fetchItems();
-    fetchPurchases();
 });

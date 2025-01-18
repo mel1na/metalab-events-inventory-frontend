@@ -9,6 +9,13 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 </head>
 <body>
+    <dialog id="auth-prompt">
+        <div class="align-vertical">
+            <div>Please log in...</div>
+            <input type="password" name="auth-input" id="auth-input" placeholder="Auth Token">
+            <button onclick="login()">Login</button>
+        </div>
+    </dialog>
     <div class="layout-wrapper">
         <div id= "purchase-statistics">
             <canvas id="purchase-statistics-canvas"></canvas>
@@ -21,27 +28,29 @@
             </table>
         </div>
         <div id="purchase-confirm" class="align-vertical">
-            <div class="spacer"></div>
+            <div class="spacer" flex></div>
             <span id="subtotal">Subtotal: 0€</span>
             <div class="align-horizontal mt-3">
                 <span>Add Tip?</span>
-                <div class="spacer"></div>
+                <div class="spacer" flex></div>
                 <input type="text" inputmode="decimal" pattern="\d*([.,]\d{1,2})?" name="tip-quantity" id="tip-qty" min="0" step="0.01" value="" placeholder="0">
                 <button id="tip-round" onclick="roundTip()">Round to next full €</button>
             </div>
             <hr>
             <span id="total">Total: 0€</span>
             <div class="align-horizontal purchase-buttons mt-5">
-                <button onclick="addPurchase('card')">Paid with Card</button>
+                <button onclick="addPurchase('card')">Pay with Card</button>
+                <div class="spacer"></div>
                 <button onclick="addPurchase('cash')">Paid in Cash</button>
             </div>
         </div>
         <div id="page-refresh" class="align-vertical">
-            <div class="spacer"></div>
+            <div class="spacer" flex></div>
             <div class="align-horizontal">
-                <div class="spacer"></div>
+                <div class="spacer" flex></div>
                 <div class="align-vertical">
                     <button onclick="fetchPurchases()">Refresh purchase statistics</button>
+                    <div class="spacer"></div>
                     <button onclick="fetchItems()">Refresh item list</button>
                     <span class="small align-right mt-5">Made by Cheos & mel1na</span>
                 </div>

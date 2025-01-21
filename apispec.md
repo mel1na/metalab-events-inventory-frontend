@@ -6,14 +6,14 @@ Endpoint: `/api/items`
 
 Required Request Header: `Authorization: Bearer <jwt>` with `"admin": "true"` grant
 #### Request
-`{"name":"Club Mate","price":3.00}`
+`{"name":"Club Mate","price":300}`
 #### Response
 ```
 {
   "data": {
     "id": 1,
     "name": "Club Mate",
-    "price": 3
+    "price": 300
   }
 }
 ```
@@ -29,13 +29,13 @@ no headers/body required
     {
       "id": 1,
       "name": "Döner",
-      "price": 5,
+      "price": 500,
       "created_at": "2025-01-19T22:08:37.656728+01:00"
     },
     {
       "id": 2,
       "name": "Club Mate",
-      "price": 3,
+      "price": 300,
       "created_at": "2025-01-19T22:08:42.764738+01:00"
     }
   ]
@@ -52,7 +52,7 @@ no headers/body required
   "data": {
     "id": 1,
     "name": "Döner",
-    "price": 5,
+    "price": 500,
     "created_at": "2025-01-19T22:08:37.656728+01:00"
   }
 }
@@ -92,7 +92,7 @@ Required Request Header: `Authorization: Bearer <jwt>` with `"iss": "metalab-eve
     }
   ],
   "payment_type": "<cash OR card>",
-  "tip": 3
+  "tip": 300
 }
 ```
 #### Response
@@ -105,20 +105,20 @@ Required Request Header: `Authorization: Bearer <jwt>` with `"iss": "metalab-eve
         "id": 1,
         "name": "Döner",
         "quantity": 1,
-        "price": 5,
+        "price": 500,
         "created_at": "0001-01-01T00:00:00Z"
       },
       {
         "id": 2,
         "name": "Club Mate",
         "quantity": 2,
-        "price": 3,
+        "price": 300,
         "created_at": "0001-01-01T00:00:00Z"
       }
     ],
     "payment_type": "card",
-    "tip": 3,
-    "final_cost": 17,
+    "tip": 300,
+    "final_cost": 1700,
     "created_at": "2025-01-19T22:44:40.356872+01:00"
   }
 }
@@ -138,20 +138,20 @@ no headers/body required
           "id": 1,
           "name": "Döner",
           "quantity": 1,
-          "price": 5,
+          "price": 500,
           "created_at": "0001-01-01T00:00:00Z"
         },
         {
           "id": 2,
           "name": "Club Mate",
           "quantity": 2,
-          "price": 3,
+          "price": 300,
           "created_at": "0001-01-01T00:00:00Z"
         }
       ],
       "payment_type": "card",
-      "tip": 3,
-      "final_cost": 17,
+      "tip": 300,
+      "final_cost": 1700,
       "created_at": "2025-01-19T22:44:40.356872+01:00"
     }
   ]
@@ -172,20 +172,20 @@ no headers/body required
         "id": 1,
         "name": "Döner",
         "quantity": 1,
-        "price": 5,
+        "price": 500,
         "created_at": "0001-01-01T00:00:00Z"
       },
       {
         "id": 2,
         "name": "Club Mate",
         "quantity": 2,
-        "price": 3,
+        "price": 300,
         "created_at": "0001-01-01T00:00:00Z"
       }
     ],
     "payment_type": "card",
-    "tip": 3,
-    "final_cost": 17,
+    "tip": 300,
+    "final_cost": 1700,
     "created_at": "2025-01-19T22:44:40.356872+01:00"
   }
 }
@@ -223,13 +223,13 @@ Required Request Header: `Authorization: Bearer <jwt>` with `"admin": "true"` gr
       {
         "id": 3,
         "name": "Tschunk",
-        "price": 5,
+        "price": 500,
         "created_at": "0001-01-01T00:00:00Z"
       },
       {
         "id": 6,
         "name": "Shot 2cl",
-        "price": 3,
+        "price": 300,
         "created_at": "0001-01-01T00:00:00Z"
       }
     ],
@@ -253,13 +253,13 @@ no headers/body required
         {
           "id": 3,
           "name": "Tschunk",
-          "price": 5,
+          "price": 500,
           "created_at": "0001-01-01T00:00:00Z"
         },
         {
           "id": 6,
           "name": "Shot 2cl",
-          "price": 3,
+          "price": 300,
           "created_at": "0001-01-01T00:00:00Z"
         }
       ],
@@ -283,13 +283,13 @@ no headers/body required
       {
         "id": 3,
         "name": "Tschunk",
-        "price": 5,
+        "price": 500,
         "created_at": "0001-01-01T00:00:00Z"
       },
       {
         "id": 6,
         "name": "Shot 2cl",
-        "price": 3,
+        "price": 300,
         "created_at": "0001-01-01T00:00:00Z"
       }
     ],

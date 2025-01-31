@@ -227,6 +227,16 @@ dialog {
 
 #purchase-overview {
     grid-column: 2;
+
+    display: grid;
+    grid-template-rows: auto max-content;
+
+    /*
+     * i have no clue why, but this makes the inner div
+     * overflow and scroll properly instead of just..
+     * re-sizing the outer div
+     */
+    overflow-y: auto;
 }
 
 #purchase-command {

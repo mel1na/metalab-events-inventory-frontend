@@ -12,9 +12,12 @@ let statisticsData = [];
 
 let tipInputsPending = 0;
 
-let qtyElements = [];
 let prices = [];
 let order = [];
+let roundUp = false;
+
+let items = []; // {id: int, name: string, price: int}
+let categories = []; // [{id: int, name: string, items: [int}
 
 const GET = async (path) => fetch(`${baseURL}${path}`, {
     method: 'GET',
@@ -34,9 +37,11 @@ const POST = async (path, data) => fetch(`${baseURL}${path}`, {
         body: JSON.stringify(data)
 }).then(r => r.json()).catch();
 
-const onLogin = () => {
-    fetchItems();
+const onLogin = async () => {
+    await fetchItems();
+    await fetchCategories();
     fetchPurchases();
+    loadCategoryOverview();
 }
 
 const login = () => {
@@ -64,58 +69,127 @@ const checkAuth = async (token) => {
     }).then(r => r.ok).catch(console.log);
 }
 
-const updateTotals = () => {
-    let tip = parseFloat($('#tip-qty').value) || 0;
+const updateOrderDisplay = () => {
     let subtotal = Math.round((order.reduce((c, v, i) => c + v * prices[i], 0)) * 100) / 100;
+    let tip = roundUp
+        ? Math.round((Math.ceil(subtotal) - subtotal) * 100) / 100
+        : 0;
     let total = Math.round((subtotal + tip) * 100) / 100;
-    $('#subtotal').innerText = `Subtotal: ${subtotal}€`;
-    $('#total').innerText = `Total: ${total}€`;
-};
-
-const roundTip = () => {
-    let subtotal = order.reduce((c, v, i) => c + v * prices[i], 0);
-    let tip = Math.round((Math.ceil(subtotal) - subtotal) * 100) / 100;
-    $('#tip-qty').value = tip || '';
-    updateTotals();
+    $('#subtotal').innerText = `Subtotal: ${total}€`;
+    //$('#total').innerText = `Total: ${total}€`;
 }
 
-const makePurchaseInput = (id, name) => {
-    let elem = document.createElement('tr');
-    elem.classList.add('purchase-input');
-    let itemName = elem.appendChild(document.createElement('td')).appendChild(document.createElement('span'));
-    let remBtn   = elem.appendChild(document.createElement('td')).appendChild(document.createElement('button'));
-    let itemQty  = elem.appendChild(document.createElement('td')).appendChild(document.createElement('span'));
-    let addBtn   = elem.appendChild(document.createElement('td')).appendChild(document.createElement('button'));
-    let set0Btn  = elem.appendChild(document.createElement('td')).appendChild(document.createElement('button'));
+const roundTip = () => {
+    roundUp = !roundUp;
+
+    if (roundUp)
+        $('#round-indicator').classList.remove('d-none');
+    else $('#round-indicator').classList.add('d-none');
+
+    updateOrderDisplay();
+}
+
+const input = (v) => {
+
+}
+
+const pos = () => {
+
+}
+
+const storno = () => {
+
+}
+
+const clear = () => {
+
+}
+
+const loadCategoryOverview = () => {
+    if (categories.length == 0) {
+        loadItemOverview();
+        return;
+    }
+    let tiles = [];
+    categories.forEach(category => tiles.push(makeCategoryTile(category.id, category.name, category.price)));
+    $('#purchase-select>div').replaceChildren(...tiles);
+}
+
+const loadItemOverview = () => {
+    let tiles = [];
+    items.forEach(item => tiles.push(makeItemTile(item.id, item.name, item.price)));
+    $('#purchase-select>div').replaceChildren(...tiles);
+}
+
+const openCategory = (id) => {
+    let tiles = [makeBackTile()];
+    categories[id].items.forEach(itemId => {
+        let item = items[itemId];
+        tiles.push(makeItemTile(item.id, item.name, item.price));
+    });
+    $('#purchase-select>div').replaceChildren(...tiles);
+}
+
+// maybe a bit overkill, but eeeeh
+const cyrb53 = (str, seed = 0) => {
+    let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+    for(let i = 0, ch; i < str.length; i++) {
+        ch = str.charCodeAt(i);
+        h1 = Math.imul(h1 ^ ch, 2654435761);
+        h2 = Math.imul(h2 ^ ch, 1597334677);
+    }
+    h1  = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
+    h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2  = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
+    h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  
+    return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+}
+
+const colors = [ 'bg-red', 'bg-blue', 'bg-green', 'bg-orange' ];
+const getColor = (str, seed = 0) => {
+    return colors[cyrb53(str, seed) & 0b11];
+}
+
+const makeCategoryTile = (id, name) => {
+    let elem = document.createElement('div');
+    let itemName  = elem.appendChild(document.createElement('span'));
     itemName.innerText = name;
-    itemQty.innerText = '0';
-    addBtn.innerText = '+';
-    remBtn.innerText = '-';
-    set0Btn.innerText = 'X';
-    addBtn.addEventListener('click', () => {
+    elem.classList.add(getColor(name, id));
+    elem.addEventListener('click', () => openCategory(id));
+    return elem;
+}
+
+const makeBackTile = () => {
+    let elem = document.createElement('div');
+    let name  = elem.appendChild(document.createElement('span'));
+    name.innerText = 'Back';
+    // elem.classList.add('');
+    elem.addEventListener('click', loadCategoryOverview);
+    return elem;
+}
+
+const makeItemTile = (id, name, price) => {
+    let elem = document.createElement('div');
+    let itemName  = elem.appendChild(document.createElement('span'));
+    let spacer    = elem.appendChild(document.createElement('div'));
+    let itemPrice = elem.appendChild(document.createElement('span'));
+    itemName.innerText = name;
+    itemPrice.innerText = `${price}€`;
+    elem.classList.add(getColor(name, id));
+    elem.addEventListener('click', () => {
         if (!order[id]) order[id] = 0;
         order[id]++;
-        itemQty.innerText = order[id];
-        updateTotals();
+        updateOrderDisplay();
     });
-    remBtn.addEventListener('click', () => {
-        if (!order[id]) order[id] = 0;
-        if (order[id] <= 0) return;
-        order[id]--;
-        itemQty.innerText = order[id];
-        updateTotals();
-    });
-    set0Btn.addEventListener('click', () => {
-        order[id] = 0;
-        itemQty.innerText = order[id];
-        updateTotals();
-    });
-    qtyElements.push(itemQty);
     return elem;
-};
+}
 
 const addPurchase = async (paymentType) => {
-    let tip = parseFloat($('#tip-qty').value) || undefined;
+    let subtotal = order.reduce((c, v, i) => c + v * prices[i], 0);
+    let tip = roundUp
+        ? Math.round((Math.ceil(subtotal) - subtotal) * 100) / 100
+        : undefined;
     let items = [];
     for (let i = 0; i < order.length; i++)
         if (order[i])
@@ -123,9 +197,8 @@ const addPurchase = async (paymentType) => {
     if (!Array.isArray(items) || !items.length) { return; }
     
     order = [];
-    qtyElements.forEach(e => e.innerText = '0');
-    $('#tip-qty').value = '';
-    updateTotals();
+    roundTip = false;
+    updateOrderDisplay();
 
     let promise = POST('/api/purchases', {
         items: items,
@@ -154,14 +227,22 @@ const fetchPurchases = async () => GET('/api/purchases')
 
 const fetchItems = async () => GET('/api/items')
 .then(r => {
-    let items = [];
-    qtyElements = [];
     prices = [];
     r.data.forEach(item => {
         prices[item.id] = item.price;
-        items.push(makePurchaseInput(item.id, `${item.name} ${item.price}€`));
+        items[item.id] = item;
     });
-    $('#purchase-inputs>table>tbody').replaceChildren(...items);
+});
+
+const fetchCategories = async () => GET('/api/groups')
+.then(r => {
+    r.data.forEach(category => {
+        categories[category.id] = {
+            id: category.id,
+            name: category.name,
+            items: category.items.map(i => i.id)
+        };
+    });
 });
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -235,20 +316,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     );
 
-    $('#tip-qty').value = '';
-    $('#tip-qty').addEventListener('input', () => {
-        tipInputsPending++;
-        setTimeout(() => {
-            tipInputsPending--;
-            if (tipInputsPending == 0)
-                updateTotals();
-        }, 200);
-    });
+    // $('#tip-qty').value = '';
+    // $('#tip-qty').addEventListener('input', () => {
+    //     tipInputsPending++;
+    //     setTimeout(() => {
+    //         tipInputsPending--;
+    //         if (tipInputsPending == 0)
+    //             updateOrderDisplay();
+    //     }, 200);
+    // });
 
-    $('#tip-round').addEventListener('click', () => {
-        if (!order[tipID]) order[tipID] = 0;
-        order[tipID] += 5;
-        $('#tip-qty').innerText = order[tipID];
-        updateTotals();
-    });
+    // $('#tip-round').addEventListener('click', () => {
+    //     if (!order[tipID]) order[tipID] = 0;
+    //     order[tipID] += 5;
+    //     $('#tip-qty').innerText = order[tipID];
+    //     updateOrderDisplay();
+    // });
 });

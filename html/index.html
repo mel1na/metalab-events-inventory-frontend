@@ -20,38 +20,45 @@
         <div id= "purchase-statistics">
             <canvas id="purchase-statistics-canvas"></canvas>
         </div>
-        <div id="purchase-inputs" class="align-vertical">
-            <table>
-                <tbody>
-                    <!-- auto-filled -->
-                </tbody>
-            </table>
-        </div>
-        <div id="purchase-confirm" class="align-vertical">
-            <div class="spacer" flex></div>
-            <span id="subtotal">Subtotal: 0€</span>
-            <div class="align-horizontal mt-3">
-                <span>Add Tip?</span>
-                <div class="spacer" flex></div>
-                <input type="text" inputmode="decimal" pattern="\d*([.,]\d{1,2})?" name="tip-quantity" id="tip-qty" min="0" step="0.01" value="" placeholder="0">
-                <button id="tip-round" onclick="roundTip()">Round to next full €</button>
+        <div id="purchase-select">
+            <div>
+                <!-- auto-filled -->
             </div>
-            <hr>
-            <span id="total">Total: 0€</span>
-            <div class="align-horizontal purchase-buttons mt-5">
-                <button onclick="addPurchase('card')">Pay with Card</button>
+        </div>
+        <div id="purchase-overview">
+        </div>
+        <div id="purchase-command" class="align-vertical">
+            <div id="numpad">
+                <button onclick="input('7')">7</button>
+                <button onclick="input('8')">8</button>
+                <button onclick="input('9')">9</button>
+                <button onclick="input('4')">4</button>
+                <button onclick="input('5')">5</button>
+                <button onclick="input('6')">6</button>
+                <button onclick="input('1')">1</button>
+                <button onclick="input('2')">2</button>
+                <button onclick="input('3')">3</button>
+                <button onclick="input('0')">0</button>
+                <button onclick="input('.')">,</button>
+            </div>
+            <hr class="mt-3 mb-3">
+            <div class="align-horizontal purchase-buttons">
+                <button class="bg-blue" onclick="pos()">POS</button>
                 <div class="spacer"></div>
-                <button onclick="addPurchase('cash')">Paid in Cash</button>
+                <button class="bg-red" onclick="storno()">Storno</button>
             </div>
-        </div>
-        <div id="page-refresh" class="align-vertical">
-            <div class="spacer" flex></div>
+            <div class="align-horizontal purchase-buttons mt-3">
+                <button class="bg-orange" onclick="addPurchase('card')">Card</button>
+                <div class="spacer"></div>
+                <button class="bg-orange" onclick="addPurchase('cash')">Cash</button>
+            </div>
+            <div class="spacer" flex=""></div>
             <div class="align-horizontal">
+                <button onclick="roundTip()" class="spacer" flex>Round Up</button>
+                <button id="clear-input" onclick="clear()">Clear Input</button>
                 <div class="spacer" flex></div>
-                <div class="align-vertical">
-                    <button onclick="fetchPurchases()">Refresh purchase statistics</button>
-                    <div class="spacer"></div>
-                    <button onclick="fetchItems()">Refresh item list</button>
+                <div id="meta" class="align-vertical">
+                    <button onclick="fetchItems(); fetchCategories(); fetchPurchases()">Refresh Data</button>
                     <span class="small align-right mt-5">Made by Cheos & mel1na</span>
                 </div>
             </div>

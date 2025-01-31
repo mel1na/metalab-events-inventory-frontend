@@ -10,7 +10,7 @@ let statisticsChart;
 let statisticsLabels = [];
 let statisticsData = [];
 
-let tipInputsPending = 0;
+// let tipInputsPending = 0;
 
 let prices = [];
 let order = [];
@@ -102,7 +102,10 @@ const storno = () => {
 }
 
 const clear = () => {
-
+    order = [];
+    roundUp = false;
+    updateOrderDisplay();
+    loadCategoryOverview();
 }
 
 const loadCategoryOverview = () => {
@@ -196,9 +199,7 @@ const addPurchase = async (paymentType) => {
             items.push({ id: i, quantity: order[i] });
     if (!Array.isArray(items) || !items.length) { return; }
     
-    order = [];
-    roundTip = false;
-    updateOrderDisplay();
+    clear();
 
     let promise = POST('/api/purchases', {
         items: items,

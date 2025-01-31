@@ -70,12 +70,12 @@ const checkAuth = async (token) => {
 }
 
 const updateOrderDisplay = () => {
-    let subtotal = Math.round((order.reduce((c, v, i) => c + v * prices[i], 0)) * 100) / 100;
+    let subtotal = order.reduce((c, v, i) => c + v * prices[i], 0);
     let tip = roundUp
-        ? Math.round((Math.ceil(subtotal) - subtotal) * 100) / 100
+        ? 100 - (subtotal % 100)
         : 0;
-    let total = Math.round((subtotal + tip) * 100) / 100;
-    $('#subtotal').innerText = `Subtotal: ${total}€`;
+    let total = subtotal + tip;
+    $('#subtotal').innerText = `Subtotal: ${total / 100}€`;
     //$('#total').innerText = `Total: ${total}€`;
 }
 
@@ -175,7 +175,7 @@ const makeItemTile = (id, name, price) => {
     let spacer    = elem.appendChild(document.createElement('div'));
     let itemPrice = elem.appendChild(document.createElement('span'));
     itemName.innerText = name;
-    itemPrice.innerText = `${price}€`;
+    itemPrice.innerText = `${price / 100}€`;
     elem.classList.add(getColor(name, id));
     elem.addEventListener('click', () => {
         if (!order[id]) order[id] = 0;

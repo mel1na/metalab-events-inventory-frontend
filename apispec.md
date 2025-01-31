@@ -59,19 +59,24 @@ no headers/body required
 ```
 
 ### Update Item -> PATCH
-Endpoint: `/api/items`
+Endpoint: `/api/items/:id`
 
 Required Request Header: `Authorization: Bearer <jwt>` with `"admin": "true"` grant
 #### Request
 #### Response
 
 ### Delete Item -> DELETE
-Endpoint: `/api/items`
+Endpoint: `/api/items/:id`
 
 Required Request Header: `Authorization: Bearer <jwt>` with `"admin": "true"` grant
 #### Request
+no body required
 #### Response
-
+```
+{
+    "data": "success"
+}
+```
 
 ## Purchases
 ### Create Purchase -> POST
@@ -192,14 +197,14 @@ no headers/body required
 ```
 
 ### Update Purchase -> PATCH
-Endpoint: `/api/purchases`
+Endpoint: `/api/purchases/:id`
 
 Required Request Header: `Authorization: Bearer <jwt>` with `"admin": "true"` grant
 #### Request
 #### Response
 
 ### Delete Purchase -> DELETE
-Endpoint: `/api/purchases`
+Endpoint: `/api/purchases/:id`
 
 Required Request Header: `Authorization: Bearer <jwt>` with `"admin": "true"` grant
 #### Request
@@ -299,14 +304,14 @@ no headers/body required
 ```
 
 ### Update Group -> PATCH
-Endpoint: `/api/groups`
+Endpoint: `/api/groups/:id`
 
 Required Request Header: `Authorization: Bearer <jwt>` with `"admin": "true"` grant
 #### Request
 #### Response
 
 ### Delete Group -> DELETE
-Endpoint: `/api/groups`
+Endpoint: `/api/groups/:id`
 
 Required Request Header: `Authorization: Bearer <jwt>` with `"admin": "true"` grant
 #### Request

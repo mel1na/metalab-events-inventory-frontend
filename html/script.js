@@ -247,8 +247,8 @@ const fetchCategories = async () => GET('/api/groups')
 });
 
 document.addEventListener('DOMContentLoaded', async () => {
-    let token = localStorage.getItem('auth_token');
-    checkAuth(token).then(ok => {
+    auth = localStorage.getItem('auth_token');
+    checkAuth(auth).then(ok => {
         if (!ok) {
             localStorage.removeItem('auth_token');
             $('#auth-prompt').showModal();

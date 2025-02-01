@@ -69,8 +69,12 @@ dialog {
 
 .layout-wrapper {
     display: grid;
+    /* $-disable-statistics
     grid-template-rows: 1fr 2fr;
     grid-template-columns: 3fr 3fr 3fr;
+    */
+    grid-template-rows: 2fr 3fr;
+    grid-template-columns: 5fr 3fr;
     height: 100svh;
     width: 100vw;
 }
@@ -138,11 +142,13 @@ dialog {
     margin-bottom: 5%;
 }
 
-.bg-red, .bg-blue, .bg-green {
+.bg-red, .bg-blue, .bg-green, .bg-orange {
     &, & > * {
         color: var(--background);
     }
+}
 
+.bg-red, .bg-blue {
     &:hover {
         color: var(--primary-hc);
         border-color: var(--primary-hc);
@@ -170,23 +176,37 @@ dialog {
 .bg-orange {
     &, & > * {
         background-color: var(--orange);
-        color: var(--background);
     }
 }
 
+/* $-disable-statistics
 #purchase-statistics {
     grid-row: 1;
     grid-column: 2 / 4;
 }
+*/
 
 #purchase-select, #purchase-overview, #purchase-command {
+    /* $-disable-statistics
     grid-row: 2;
     padding: 2%;
+    */
+    padding: .5vw;
 
+    /* $-disable-statistics
     border-top: 2px solid var(--foreground);
 
     &:not(:last-child) {
         border-right: 2px solid var(--foreground);
+    }
+    */
+
+    &:first-child {
+        border-right: 2px solid var(--foreground);
+    }
+
+    &:last-child {
+        border-top: 2px solid var(--foreground);
     }
 }
 
@@ -198,14 +218,17 @@ dialog {
     overflow-y: auto;
     scroll-behavior: smooth;
     scroll-snap-type: y mandatory;
+    /* $-disable-statistics
     scroll-padding: 2%;
+    */
+    scroll-padding: 1%;
     scrollbar-width: thin;
 
     border-top: none;
 
     & > div {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(6, 1fr);
         height: min-content;
 
         border: 3px solid var(--foreground);
@@ -227,6 +250,7 @@ dialog {
 
 #purchase-overview {
     grid-column: 2;
+    grid-row: 1;
 
     display: grid;
     grid-template-rows: auto max-content;
@@ -240,7 +264,11 @@ dialog {
 }
 
 #purchase-command {
+    /* $-disable-statistics
     grid-column: 3;
+    */
+    grid-column: 2;
+    grid-row: 2;
 }
 
 #item-list {

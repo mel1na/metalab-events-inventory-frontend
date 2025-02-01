@@ -38,7 +38,9 @@ const POST = async (path, data) => fetch(`${baseURL}${path}`, {
 const onLogin = async () => {
     await fetchItems();
     await fetchCategories();
+    /* $-disable-statistics
     fetchPurchases();
+    */
     loadCategoryOverview();
 }
 
@@ -99,7 +101,7 @@ const storno = () => {
 
 }
 
-const clear = () => {
+const clearInput = () => {
     order = [];
     roundUp = false;
     updateOrderDisplay();
@@ -197,17 +199,21 @@ const addPurchase = async (paymentType) => {
             items.push({ id: i, quantity: order[i] });
     if (!Array.isArray(items) || !items.length) { return; }
     
-    clear();
+    clearInput();
 
     let promise = POST('/api/purchases', {
         items: items,
         tip: tip,
         payment_type: paymentType
     });
+    
+    /* $-disable-statistics
     setTimeout(fetchPurchases, 200);
+    */
     return promise;
 }
 
+/* $-disable-statistics
 const fetchPurchases = async () => GET('/api/purchases')
 .then(r => {
     // the way this api works surely won't lead to issues later down the line (foreshadowing)
@@ -223,6 +229,7 @@ const fetchPurchases = async () => GET('/api/purchases')
     });
     statisticsChart.update();
 });
+*/
 
 const fetchItems = async () => GET('/api/items')
 .then(r => {
@@ -252,8 +259,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             $('#auth-prompt').showModal();
         } else onLogin();
     })
-
-
+    
+    /* $-disable-statistics
     Chart.register(ChartDataLabels);
     Chart.defaults.font.size = 24;
     statisticsChart = new Chart(
@@ -314,4 +321,5 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
     );
+    */
 });

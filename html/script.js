@@ -10,8 +10,6 @@ let statisticsChart;
 let statisticsLabels = [];
 let statisticsData = [];
 
-// let tipInputsPending = 0;
-
 let prices = [];
 let order = [];
 let roundUp = false;
@@ -71,7 +69,7 @@ const checkAuth = async (token) => {
 
 const updateOrderDisplay = () => {
     let subtotal = order.reduce((c, v, i) => c + v * prices[i], 0);
-    let tip = roundUp
+    let tip = roundUp && subtotal % 100
         ? 100 - (subtotal % 100)
         : 0;
     let total = subtotal + tip;
@@ -190,8 +188,8 @@ const makeItemTile = (id, name, price) => {
 
 const addPurchase = async (paymentType) => {
     let subtotal = order.reduce((c, v, i) => c + v * prices[i], 0);
-    let tip = roundUp
-        ? Math.round((Math.ceil(subtotal) - subtotal) * 100) / 100
+    let tip = roundUp && subtotal % 100
+        ? 100 - (subtotal % 100)
         : undefined;
     let items = [];
     for (let i = 0; i < order.length; i++)
@@ -316,21 +314,4 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
     );
-
-    // $('#tip-qty').value = '';
-    // $('#tip-qty').addEventListener('input', () => {
-    //     tipInputsPending++;
-    //     setTimeout(() => {
-    //         tipInputsPending--;
-    //         if (tipInputsPending == 0)
-    //             updateOrderDisplay();
-    //     }, 200);
-    // });
-
-    // $('#tip-round').addEventListener('click', () => {
-    //     if (!order[tipID]) order[tipID] = 0;
-    //     order[tipID] += 5;
-    //     $('#tip-qty').innerText = order[tipID];
-    //     updateOrderDisplay();
-    // });
 });

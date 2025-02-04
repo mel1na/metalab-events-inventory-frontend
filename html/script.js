@@ -1,7 +1,7 @@
 const $ = q => document.querySelector(q);
 const baseURL = document.location.protocol === 'file:' || document.location.hostname === 'localhost' || document.location.hostname === '127.0.0.1'
     ? 'http://localhost:8080'
-    : 'https://metalab-pos.gupper.systems';
+    : 'https://pos.metarave.jetzt';
 const foregroundColor = '#ffefef';
 
 let auth = undefined;

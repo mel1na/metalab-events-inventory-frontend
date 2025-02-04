@@ -84,6 +84,13 @@ dialog {
     border-color: var(--failure);
 }
 
+.selected {
+    & > :first-child {
+        text-decoration: underline;
+        font-weight: bold;
+    }
+}
+
 .purchase-buttons > button {
     flex-grow: 1;
     flex-basis: 0;

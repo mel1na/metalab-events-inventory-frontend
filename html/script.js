@@ -11,6 +11,7 @@ let statisticsLabels = [];
 let statisticsData = [];
 
 let order = [];
+let orderElements = [];
 let roundUp = false;
 
 let items = []; // {id: int, name: string, price: int}
@@ -81,7 +82,7 @@ const updateOrderDisplay = () => {
     //$('#total').innerText = `Total: ${total}€`;
     // TODO
 
-    let elems = [];
+    orderElements = [];
     for (let i = 0; i < order.length; i++) {
         let item = order[i];
         let elem = document.createElement('div');
@@ -90,6 +91,8 @@ const updateOrderDisplay = () => {
         let itemPrice = elem.appendChild(document.createElement('span'));
 
         elem.classList.add('align-horizontal');
+        if (i == selection)
+            elem.classList.add('selected');
 
         itemName.innerText = item.id === 0 ? 'POS' : items[item.id].name;
         console.log(item.amount);
@@ -100,10 +103,15 @@ const updateOrderDisplay = () => {
         spacer.classList.add('spacer');
         spacer.setAttribute('flex', 'true');
 
-        elem.addEventListener('click', () => selection = i);
-        elems.push(elem);
+        elem.addEventListener('click', () => {
+            elem.classList.add('selected');
+            if (selection !== -1)
+                orderElements[selection].classList.remove('selected');
+            selection = i;
+        });
+        orderElements.push(elem);
     }
-    $('#item-list').replaceChildren(...elems);
+    $('#item-list').replaceChildren(...orderElements);
 }
 
 const updateInputDisplay = () => {
@@ -127,6 +135,7 @@ const input = (v) => {
 
 const pos = () => {
     if (!currentInput) {
+        orderElements[selection].classList.remove('selected');
         selection = -1;
         return;
     }
@@ -161,7 +170,7 @@ const storno = () => {
             order.pop();
         else {
             order.splice(selection, 1);
-            selection = -2;
+            selection = -1;
         }
         updateOrderDisplay();
     }

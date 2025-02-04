@@ -24,7 +24,8 @@ body {
     height: 100vh;
     margin: 0;
     padding: 0;
-    touch-action: pan-y;
+    -webkit-text-size-adjust: none;
+	touch-action: manipulation;
 }
 
 button {

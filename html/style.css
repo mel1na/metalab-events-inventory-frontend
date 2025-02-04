@@ -285,10 +285,24 @@ dialog {
     & > * {
         scroll-snap-align: center;
         align-content: start;
-        border: 1px dashed yellow;
 
-        &:not(:first-child) {
-            margin-top: 2%;
+        &:first-child {
+            margin-top: 1%;
+        }
+
+        &:last-child {
+            margin-bottom: 2%;
+        }
+
+        &:not(:last-child):after {
+            content: "";
+            display: block;
+            margin: 1% auto;
+            width: 90%;
+            padding-top: 10px;
+            border-bottom: 2px solid;
+            border-image-slice: 1;
+            border-image-source: linear-gradient(to right, var(--foreground), var(--background));
         }
     }
 }

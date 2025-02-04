@@ -10,12 +10,14 @@ let statisticsChart;
 let statisticsLabels = [];
 let statisticsData = [];
 
-let prices = [];
 let order = [];
 let roundUp = false;
 
 let items = []; // {id: int, name: string, price: int}
 let categories = []; // [{id: int, name: string, items: [int}
+
+let currentInput = '';
+let selection = -1;
 
 const GET = async (path) => fetch(`${baseURL}${path}`, {
     method: 'GET',
@@ -70,13 +72,42 @@ const checkAuth = async (token) => {
 }
 
 const updateOrderDisplay = () => {
-    let subtotal = order.reduce((c, v, i) => c + v * prices[i], 0);
+    let subtotal = order.reduce((c, v, i) => c + v.amount * (v.id === 0 ? v.price : items[v.id].price), 0);
     let tip = roundUp && subtotal % 100
         ? 100 - (subtotal % 100)
         : 0;
     let total = subtotal + tip;
     $('#subtotal').innerText = `Subtotal: ${total / 100}€`;
     //$('#total').innerText = `Total: ${total}€`;
+    // TODO
+
+    let elems = [];
+    for (let i = 0; i < order.length; i++) {
+        let item = order[i];
+        let elem = document.createElement('div');
+        let itemName  = elem.appendChild(document.createElement('span'));
+        let spacer    = elem.appendChild(document.createElement('div'));
+        let itemPrice = elem.appendChild(document.createElement('span'));
+
+        elem.classList.add('align-horizontal');
+
+        itemName.innerText = item.id === 0 ? 'POS' : items[item.id].name;
+        console.log(item.amount);
+        if (item.amount > 1)
+            itemName.innerText += ` (${item.amount})`
+        itemPrice.innerText = `${((item.id === 0 ? item.price : items[item.id].price) * item.amount) / 100}€`;
+
+        spacer.classList.add('spacer');
+        spacer.setAttribute('flex', 'true');
+
+        elem.addEventListener('click', () => selection = i);
+        elems.push(elem);
+    }
+    $('#item-list').replaceChildren(...elems);
+}
+
+const updateInputDisplay = () => {
+    $('#input').innerText = `Input: ${currentInput}`
 }
 
 const roundTip = () => {
@@ -90,20 +121,65 @@ const roundTip = () => {
 }
 
 const input = (v) => {
-
+    currentInput += v;
+    updateInputDisplay();
 }
 
 const pos = () => {
+    if (!currentInput) {
+        selection = -1;
+        return;
+    }
 
+    if (order.length > 0 && (order[order.length - 1].amount === 1 || selection !== -1) && !currentInput.includes('.'))
+        order[selection !== -1 ? selection : order.length - 1].amount = parseInt(currentInput);
+    else {
+        let parts = currentInput.split('.', 2)
+        if (parts.length > 1) {
+            parts[1] = parts[1].replace('.', '').substring(0, 2);
+            while (parts[1].length < 2)
+                parts[1] += '0';
+        } else parts[0] += '00';
+        order.push({
+            id: 0,
+            amount: 1,
+            price: parseInt(parts.join(''))
+        });
+    }
+
+    currentInput = '';
+    updateInputDisplay();
+    updateOrderDisplay();
 }
 
 const storno = () => {
+    if (currentInput) {
+        currentInput = '';
+        updateInputDisplay();
+    } else if (order) {
+        if (selection < 0)
+            order.pop();
+        else {
+            order.splice(selection, 1);
+            selection = -2;
+        }
+        updateOrderDisplay();
+    }
+}
 
+const addToOrder = (id) => {
+    order.push({
+        id: id,
+        amount: 1
+    });
+    updateOrderDisplay();
 }
 
 const clearInput = () => {
+    currentInput = '';
     order = [];
     roundUp = false;
+    updateInputDisplay();
     updateOrderDisplay();
     loadCategoryOverview();
 }
@@ -180,24 +256,23 @@ const makeItemTile = (id, name, price) => {
     itemName.innerText = name;
     itemPrice.innerText = `${price / 100}€`;
     elem.classList.add(getColor(name, id));
-    elem.addEventListener('click', () => {
-        if (!order[id]) order[id] = 0;
-        order[id]++;
-        updateOrderDisplay();
-    });
+    elem.addEventListener('click', () => addToOrder(id));
     return elem;
 }
 
 const addPurchase = async (paymentType) => {
-    let subtotal = order.reduce((c, v, i) => c + v * prices[i], 0);
+    let subtotal = order.reduce((c, v, i) => c + v.amount * (v.id === 0 ? v.price : items[v.id].price), 0);
     let tip = roundUp && subtotal % 100
         ? 100 - (subtotal % 100)
         : undefined;
     let items = [];
-    for (let i = 0; i < order.length; i++)
-        if (order[i])
-            items.push({ id: i, quantity: order[i] });
-    if (!Array.isArray(items) || !items.length) { return; }
+    order.forEach(item => {
+        if (item.id === 0)
+            tip += item.amount * item.price;
+        else items.push({ id: item.id, quantity: item.amount })
+    });
+    if (items.length === 0 && tip <= 0)
+        return;
     
     clearInput();
 
@@ -205,7 +280,7 @@ const addPurchase = async (paymentType) => {
         items: items,
         tip: tip,
         payment_type: paymentType
-    });
+    }); // TODO card confirmation?
     
     /* $-disable-statistics
     setTimeout(fetchPurchases, 200);
@@ -233,11 +308,8 @@ const fetchPurchases = async () => GET('/api/purchases')
 
 const fetchItems = async () => GET('/api/items')
 .then(r => {
-    prices = [];
-    r.data.forEach(item => {
-        prices[item.id] = item.price;
-        items[item.id] = item;
-    });
+    items = [];
+    r.data.forEach(item => items[item.id] = item);
 });
 
 const fetchCategories = async () => GET('/api/groups')

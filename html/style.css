@@ -253,6 +253,8 @@ dialog {
     grid-column: 2;
     grid-row: 1;
 
+    min-height: 30svh;
+
     display: grid;
     grid-template-rows: auto max-content;
 
@@ -277,6 +279,7 @@ dialog {
     overflow-y: auto;
     scroll-behavior: smooth;
     scroll-snap-type: y mandatory;
+    scrollbar-gutter: stable;
     scrollbar-width: thin;
 
     border-top: 3px solid var(--foreground);
@@ -285,6 +288,7 @@ dialog {
     & > * {
         scroll-snap-align: center;
         align-content: start;
+        flex-wrap: wrap;
 
         &:first-child {
             margin-top: 1%;
@@ -303,6 +307,10 @@ dialog {
             border-bottom: 2px solid;
             border-image-slice: 1;
             border-image-source: linear-gradient(to right, var(--foreground), var(--background));
+        }
+
+        & > :last-child {
+            padding-right: 2%;
         }
     }
 }

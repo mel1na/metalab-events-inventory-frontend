@@ -33,7 +33,7 @@ button {
     padding: 8px;
     min-height: 2em;
     min-width: 2em;
-    font-size: xx-large;
+    font-size: x-large;
 
     &:hover {
         color: var(--primary);
@@ -87,7 +87,7 @@ dialog {
 .purchase-buttons > button {
     flex-grow: 1;
     flex-basis: 0;
-    font-size: xxx-large;
+    font-size: xx-large;
 }
 
 .align-vertical {
@@ -229,7 +229,7 @@ dialog {
 
     & > div {
         display: grid;
-        grid-template-columns: repeat(6, 1fr);
+        grid-template-columns: repeat(4, 1fr);
         height: min-content;
 
         border: 3px solid var(--foreground);
@@ -321,10 +321,10 @@ dialog {
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(4, 1fr);
 
-    gap: 20px;
+    gap: 10px;
 
     & > button {
-        font-size: xxx-large;
+        font-size: xx-large;
         &:nth-child(10) {
             grid-column: 1 / 3;
         }

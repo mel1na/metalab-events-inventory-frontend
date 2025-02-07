@@ -12,6 +12,7 @@ const baseURL = isIndev
 const foregroundColor = '#ffefef';
 
 let ws;
+let wsConnectPending = false;
 
 let gitHash = '[indev]';
 let rawAuth = undefined;
@@ -66,7 +67,10 @@ const DELETE = async (path, data) => fetch(`${baseURL}${path}`, {
 }).then(r => r.json()).catch(console.log);
 
 const onLogin = async () => {
-    connectWs();
+    if (!wsConnectPending) {
+        wsConnectPending = true;
+        connectWs();
+    }
 
     await fetchItems();
     await fetchCategories();
@@ -372,6 +376,7 @@ const selectReader = () => {
 
 const connectWs = () => {
     ws = new WebSocket(baseURL + '/api/payments');
+    wsConnectPending = false;
 
     ws.addEventListener('message', e => {
         let data = JSON.parse(e.data);
@@ -407,13 +412,19 @@ const connectWs = () => {
     ws.addEventListener('error', e => {
         ws = undefined;
         $('#ws-disconnect').showModal();
-        setTimeout(connectWs, 1000);
+        if (!wsConnectPending) {
+            wsConnectPending = true;
+            setTimeout(connectWs, 1000);
+        }
     });
 
     ws.addEventListener('close', e => {
         ws = undefined;
         $('#ws-disconnect').showModal();
-        setTimeout(connectWs, 1000);
+        if (!wsConnectPending) {
+            wsConnectPending = true;
+            setTimeout(connectWs, 1000);
+        }
     });
 }
 

@@ -336,7 +336,7 @@ const addPurchase = async (paymentType) => {
                         break;
                 }
                 lastKnownTransactionStatus = null;
-            } else pendingTransaction = r.client_transaction_id;
+            } else pendingTransaction = r.data.client_transaction_id;
             return r;
         });
         $('#transaction-processing').showModal();

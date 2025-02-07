@@ -24,10 +24,32 @@
             <button onclick="login()">Login</button>
         </div>
     </dialog>
+    <dialog id="ws-disconnect">
+        <div class="align-vertical">
+            <span>WebSocket disconnected!</span><br>
+            <span>Attempting to reconnect...</span>
+            <hr>
+            <button onclick="$('#ws-disconnect').close()">Close</button>
+        </div>
+    </dialog>
+    <dialog id="transaction-failed">
+        <div class="align-vertical">
+            <span>Transaction declined!</span>
+            <hr>
+            <button onclick="$('#transaction-failed').close()">Close</button>
+        </div>
+    </dialog>
+    <dialog id="transaction-processing">
+        <div class="align-vertical">
+            <span>Transaction processing...</span>
+            <hr>
+            <button id="transaction-cancel-btn" onclick="cancelTransaction()" disabled>Cancel transaction</button>
+        </div>
+    </dialog>
     <dialog id="settings">
         <div class="align-vertical">
             <span>Select Sumup Reader</span>
-            <select name="sumup-reader-select" id="sumup-reader-select">
+            <select name="sumup-reader-select" id="sumup-reader-select" onchange="selectReader()">
                 <option value="0">ERROR FETCHING READERS</option>
                 <!-- auto-filled -->
             </select>
@@ -87,9 +109,9 @@
                 <button class="bg-red" onclick="storno()">Storno</button>
             </div>
             <div class="align-horizontal purchase-buttons mt-3">
-                <button class="bg-green" onclick="addPurchase('card')">Card</button>
+                <button id="purchase-card" class="bg-green" onclick="addPurchase('card')" disabled>Card</button>
                 <div class="spacer"></div>
-                <button class="bg-orange" onclick="addPurchase('cash')">Cash</button>
+                <button id="purchase-cash" class="bg-orange" onclick="addPurchase('cash')">Cash</button>
             </div>
             <div class="spacer" flex=""></div>
             <div class="align-horizontal">

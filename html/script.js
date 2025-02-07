@@ -1,11 +1,20 @@
 const $ = q => document.querySelector(q);
-const baseURL = document.location.protocol === 'file:' || document.location.hostname === 'localhost' || document.location.hostname === '127.0.0.1'
-    ? 'http://localhost:8080'
-    : 'https://pos.metarave.jetzt';
+const isIndev = document.location.protocol === 'file:'
+    || document.location.hostname === 'localhost'
+    || document.location.hostname === '127.0.0.1';
+const baseDomain = isIndev
+    ? 'localhost:8080'
+    : 'pos.metarave.jetzt';
+const baseURL = isIndev
+    ? `http://${baseDomain}`
+    : `https://${baseDomain}`;
+
 const foregroundColor = '#ffefef';
 
-let gitHash = '[indev]';
+let ws;
 
+let gitHash = '[indev]';
+let rawAuth = undefined;
 let auth = undefined;
 
 let statisticsChart;
@@ -18,10 +27,15 @@ let roundUp = false;
 
 let items = []; // {id: int, name: string, price: int}
 let categories = []; // [{id: int, name: string, items: [int}
-let readers = [];
+let readers = [];// [{id: string, name: string, ...}
 
 let currentInput = '';
 let selection = -1;
+let selectedReader = 0;
+
+let pendingTransaction;
+let lastKnownTransactionStatus;
+
 
 const GET = async (path) => fetch(`${baseURL}${path}`, {
     method: 'GET',
@@ -41,7 +55,19 @@ const POST = async (path, data) => fetch(`${baseURL}${path}`, {
         body: JSON.stringify(data)
 }).then(r => r.json()).catch(console.log);
 
+const DELETE = async (path, data) => fetch(`${baseURL}${path}`, {
+    method: 'delete',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': auth
+        },
+        body: JSON.stringify(data)
+}).then(r => r.json()).catch(console.log);
+
 const onLogin = async () => {
+    connectWs();
+
     await fetchItems();
     await fetchCategories();
     await fetchReaders();
@@ -58,7 +84,8 @@ const login = () => {
     checkAuth(token).then(async ok => {
         if (ok) {
             auth = token;
-            localStorage.setItem('auth_token', token);
+            rawAuth = token.split(' ', 2)[1];
+            localStorage.setItem('auth_token', rawAuth);
             await onLogin();
             $('#auth-prompt').close();
         } else
@@ -223,7 +250,7 @@ const openCategory = (id) => {
 // maybe a bit overkill, but eeeeh
 const cyrb53 = (str, seed = 0) => {
     let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
-    for(let i = 0, ch; i < str.length; i++) {
+    for (let i = 0, ch; i < str.length; i++) {
         ch = str.charCodeAt(i);
         h1 = Math.imul(h1 ^ ch, 2654435761);
         h2 = Math.imul(h2 ^ ch, 1597334677);
@@ -232,7 +259,6 @@ const cyrb53 = (str, seed = 0) => {
     h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
     h2  = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
     h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
-  
     return 4294967296 * (2097151 & h2) + (h1 >>> 0);
 }
 
@@ -254,7 +280,6 @@ const makeBackTile = () => {
     let elem = document.createElement('div');
     let name  = elem.appendChild(document.createElement('span'));
     name.innerText = 'Back';
-    // elem.classList.add('');
     elem.addEventListener('click', loadCategoryOverview);
     return elem;
 }
@@ -284,16 +309,19 @@ const addPurchase = async (paymentType) => {
     });
     if (items.length === 0 && tip <= 0)
         return;
-    
-    clearInput();
 
     let promise = POST('/api/purchases', {
         items: items,
         tip: tip,
         payment_type: paymentType,
-        reader: readers[parseInt($('#sumup-reader-select').value)]?.id, // NOTE: TODO there is no actual api for this yet
-    }); // TODO card confirmation? (no api yet)
-    
+        reader_id: readers[selectedReader]?.id,
+    });
+
+    if (paymentType === 'card') {
+        promise = promise.then(r => pendingTransaction = r.id);
+        $('#transaction-processing').showModal();
+    } else clearInput();
+
     /* $-disable-statistics
     setTimeout(fetchPurchases, 200);
     */
@@ -326,7 +354,7 @@ const fetchReaders = async () => GET('/api/payments/readers')
 
     let def = document.createElement('option');
     def.setAttribute('value', '0');
-    def.innerText = 'default';
+    def.innerText = 'None';
     options.push(def);
 
     readers.forEach((reader, i) => {
@@ -338,6 +366,8 @@ const fetchReaders = async () => GET('/api/payments/readers')
     });
 
     $('#sumup-reader-select').replaceChildren(...options);
+    $('#sumup-reader-select').value = '0';
+    selectReader();
 });
 
 const fetchItems = async () => GET('/api/items')
@@ -357,17 +387,82 @@ const fetchCategories = async () => GET('/api/groups')
     });
 });
 
+const selectReader = () => {
+    selectedReader = parseInt($('#sumup-reader-select').value);
+    let active = selectedReader !== 0;
+    $('#transaction-cancel-btn').disabled = active;
+    //$('#purchase-card').disabled = active;
+}
+
+const connectWs = () => {
+    ws = new WebSocket(baseURL + '/api/payments');
+
+    ws.addEventListener('message', e => {
+        let data = JSON.parse(e.data);
+
+        if (!pendingTransaction) {
+            lastKnownTransactionStatus = data;
+            return;
+        }
+
+        if (pendingTransaction !== data.client_transaction_id)
+            return;
+
+        switch (data.transaction_status) {
+            case 'cancelled', 'failed':
+                $('#transaction-failed').showModal();
+                $('#transaction-processing').close();
+                break;
+            case 'successful':
+                clearInput();
+                $('#transaction-processing').close();
+                break;
+            case 'pending':
+            default:
+                return;
+        }
+    });
+
+    ws.addEventListener('open', e => {
+        $('#ws-disconnect').close();
+        ws.send(rawAuth);
+    });
+
+    ws.addEventListener('error', e => {
+        ws = undefined;
+        $('#ws-disconnect').showModal();
+        setTimeout(connectWs, 1000);
+    });
+
+    ws.addEventListener('close', e => {
+        ws = undefined;
+        $('#ws-disconnect').showModal();
+        setTimeout(connectWs, 1000);
+    });
+}
+
+const cancelTransaction = () => {
+    DELETE('/api/payments/terminate', {
+        id: readers[selectedReader]?.id,
+    }).then(() => {
+        $('#transaction-processing').close();
+    });
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
-    auth = localStorage.getItem('auth_token');
+    rawAuth = localStorage.getItem('auth_token');
+    auth = 'Bearer ' + rawAuth;
     checkAuth(auth).then(ok => {
         if (!ok) {
+            rawAuth = auth = undefined;
             localStorage.removeItem('auth_token');
             $('#auth-prompt').showModal();
         } else onLogin();
-    })
+    });
 
     $('#version-display').innerText = `Version: ${gitHash}`;
-    
+
+
 /* $-disable-statistics
     Chart.register(ChartDataLabels);
     Chart.defaults.font.size = 24;

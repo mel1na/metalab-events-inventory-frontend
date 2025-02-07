@@ -9,6 +9,7 @@
     --blue:  #488ae0;
     --green: #72c35e;
     --orange: #ea993d;
+    --disabled: #6f6f72;
 }
 
 * {
@@ -36,9 +37,14 @@ button, select {
     min-width: 2em;
     font-size: x-large;
 
-    &:hover {
+    &:hover:not(:disabled) {
         color: var(--primary);
         border-color: var(--primary);
+    }
+
+    &:disabled {
+        color: var(--disabled);
+        background-color: var(--disabled);
     }
 }
 
@@ -191,6 +197,10 @@ dialog {
 
 #auth-prompt > div > * {
     margin-bottom: 5%;
+}
+
+#transaction-failed {
+    border-color: var(--failure);
 }
 
 #settings {

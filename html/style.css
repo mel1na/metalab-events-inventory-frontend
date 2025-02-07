@@ -28,7 +28,7 @@ body {
 	touch-action: manipulation;
 }
 
-button {
+button, select {
     border: 3px solid var(--foreground);
     border-radius: 10px;
     padding: 8px;
@@ -59,6 +59,7 @@ dialog {
     outline: none;
     border: 1px solid var(--foreground);
     border-radius: 10px;
+    min-width: 30%;
 
     &::backdrop {
         backdrop-filter: blur(1px) brightness(75%);
@@ -185,6 +186,20 @@ dialog {
 .bg-orange {
     &, & > * {
         background-color: var(--orange);
+    }
+}
+
+#auth-prompt > div > * {
+    margin-bottom: 5%;
+}
+
+#settings {
+    & > div > *:not(:last-child) {
+        margin-bottom: 2%;
+    }
+
+    hr {
+        margin-top: -.25%;
     }
 }
 
@@ -340,10 +355,6 @@ dialog {
 
 #purchase-statistics-canvas {
     max-height: 100%;
-}
-
-#auth-prompt > div > * {
-    margin-bottom: 5%;
 }
 
 #numpad {

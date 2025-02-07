@@ -24,6 +24,22 @@
             <button onclick="login()">Login</button>
         </div>
     </dialog>
+    <dialog id="settings">
+        <div class="align-vertical">
+            <span>Select Sumup Reader</span>
+            <select name="sumup-reader-select" id="sumup-reader-select">
+                <option value="0">ERROR FETCHING READERS</option>
+                <!-- auto-filled -->
+            </select>
+            <hr>
+            <button onclick="fetchItems(); fetchCategories(); fetchReaders(); /* $-disable-statistics fetchPurchases() */">Refresh Data</button>
+            <button onclick="$('#settings').close()">Close</button>
+            <div class="align-horizontal">
+                <span class="spacer" flex></span>
+                <span id="version-display" class="small"></span>
+            </div>
+        </div>
+    </dialog>
     <div class="layout-wrapper">
         <!-- $-disable-statistics
         <div id= "purchase-statistics">
@@ -81,7 +97,7 @@
                 <button id="clear-input" onclick="clearInput()">Clear Input</button>
                 <div class="spacer" flex></div>
                 <div id="meta" class="align-vertical">
-                    <button onclick="fetchItems(); fetchCategories(); /* $-disable-statistics fetchPurchases() */">Refresh Data</button>
+                    <button onclick="$('#settings').showModal()">Settings</button>
                     <span class="small align-right mt-5">Made by Cheos & mel1na</span>
                 </div>
             </div>

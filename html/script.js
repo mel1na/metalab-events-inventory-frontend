@@ -18,6 +18,7 @@ let roundUp = false;
 
 let items = []; // {id: int, name: string, price: int}
 let categories = []; // [{id: int, name: string, items: [int}
+let readers = [];
 
 let currentInput = '';
 let selection = -1;
@@ -28,7 +29,7 @@ const GET = async (path) => fetch(`${baseURL}${path}`, {
         'Accept': 'application/json',
         'Authorization': auth
     }
-}).then(r => r.json()).catch();
+}).then(r => r.json()).catch(console.log);
 
 const POST = async (path, data) => fetch(`${baseURL}${path}`, {
     method: 'post',
@@ -38,11 +39,12 @@ const POST = async (path, data) => fetch(`${baseURL}${path}`, {
             'Authorization': auth
         },
         body: JSON.stringify(data)
-}).then(r => r.json()).catch();
+}).then(r => r.json()).catch(console.log);
 
 const onLogin = async () => {
     await fetchItems();
     await fetchCategories();
+    await fetchReaders();
     /* $-disable-statistics
     fetchPurchases();
     */
@@ -53,12 +55,12 @@ const login = () => {
     let token = $('#auth-input').value;
     if (!token.startsWith('Bearer '))
         token = 'Bearer ' + token;
-    checkAuth(token).then(ok => {
+    checkAuth(token).then(async ok => {
         if (ok) {
             auth = token;
             localStorage.setItem('auth_token', token);
+            await onLogin();
             $('#auth-prompt').close();
-            onLogin();
         } else
             $('#auth-input').classList.add('error');
     });
@@ -81,8 +83,6 @@ const updateOrderDisplay = () => {
         : 0;
     let total = subtotal + tip;
     $('#subtotal').innerText = `Subtotal: ${total / 100}€`;
-    //$('#total').innerText = `Total: ${total}€`;
-    // TODO
 
     orderElements = [];
     for (let i = 0; i < order.length; i++) {
@@ -290,8 +290,9 @@ const addPurchase = async (paymentType) => {
     let promise = POST('/api/purchases', {
         items: items,
         tip: tip,
-        payment_type: paymentType
-    }); // TODO card confirmation?
+        payment_type: paymentType,
+        reader: readers[parseInt($('#sumup-reader-select').value)]?.id, // NOTE: TODO there is no actual api for this yet
+    }); // TODO card confirmation? (no api yet)
     
     /* $-disable-statistics
     setTimeout(fetchPurchases, 200);
@@ -316,6 +317,28 @@ const fetchPurchases = async () => GET('/api/purchases')
     statisticsChart.update();
 });
 */
+
+const fetchReaders = async () => GET('/api/payments/readers')
+.then(r => {
+    readers = r ? [null, ...r.data] : [null];
+
+    let options = [];
+
+    let def = document.createElement('option');
+    def.setAttribute('value', '0');
+    def.innerText = 'default';
+    options.push(def);
+
+    readers.forEach((reader, i) => {
+        if (i == 0) return; // default reader
+        let opt = document.createElement('option');
+        opt.setAttribute('value', `${i}`);
+        opt.innerText = reader.name;
+        options.push(opt);
+    });
+
+    $('#sumup-reader-select').replaceChildren(...options);
+});
 
 const fetchItems = async () => GET('/api/items')
 .then(r => {
@@ -345,7 +368,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     $('#version-display').innerText = `Version: ${gitHash}`;
     
-    /* $-disable-statistics
+/* $-disable-statistics
     Chart.register(ChartDataLabels);
     Chart.defaults.font.size = 24;
     statisticsChart = new Chart(
@@ -406,5 +429,5 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
     );
-    */
+*/
 });

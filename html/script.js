@@ -71,9 +71,6 @@ const onLogin = async () => {
     await fetchItems();
     await fetchCategories();
     await fetchReaders();
-    /* $-disable-statistics
-    fetchPurchases();
-    */
     loadCategoryOverview();
 }
 
@@ -322,29 +319,8 @@ const addPurchase = async (paymentType) => {
         $('#transaction-processing').showModal();
     } else clearInput();
 
-    /* $-disable-statistics
-    setTimeout(fetchPurchases, 200);
-    */
     return promise;
 }
-
-/* $-disable-statistics
-const fetchPurchases = async () => GET('/api/purchases')
-.then(r => {
-    // the way this api works surely won't lead to issues later down the line (foreshadowing)
-    statisticsData.length = 0;
-    statisticsLabels.length = 0;
-    r.data.forEach(purchase => {
-        if (purchase?.items)
-            purchase.items.forEach(item => {
-                if (!statisticsLabels[item.id]) statisticsLabels[item.id] = item.name;
-                if (!statisticsData[item.id]) statisticsData[item.id] = item.quantity;
-                else statisticsData[item.id] += item.quantity;
-            });
-    });
-    statisticsChart.update();
-});
-*/
 
 const fetchReaders = async () => GET('/api/payments/readers')
 .then(r => {
@@ -461,68 +437,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     $('#version-display').innerText = `Version: ${gitHash}`;
-
-
-/* $-disable-statistics
-    Chart.register(ChartDataLabels);
-    Chart.defaults.font.size = 24;
-    statisticsChart = new Chart(
-        $('#purchase-statistics-canvas'),
-        {
-            type: 'bar',
-            options: {
-                animation: true,
-                aspectRatio: 3,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            display: false
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            color: foregroundColor
-                        }
-                    }
-                },
-                layout: {
-                    padding: 15
-                },
-                plugins: {
-                    legend: {
-                        display: false,
-                        position: 'bottom',
-                        labels: {
-                            color: foregroundColor,
-                            font: {
-                                size: 24
-                            }
-                        }
-                    },
-                    tooltip: {
-                        enabled: false
-                    },
-                    datalabels: {
-                        formatter: (value, ctx) => value,
-                        color: foregroundColor,
-                        font: {
-                            size: 24
-                        }
-                    }
-                }
-            },
-            data: {
-                labels: statisticsLabels,
-                datasets: [
-                    {
-                        data: statisticsData,
-                        backgroundColor: [ '#BF307A', '#309FBF', '#30BF33', '#30BF88', '#7030BF', '#BF3098', '#BF5230', '#309FBF', '#BF3095', '#30BFAD', '#3D30BF', '#4BBF30', '#BF3041', '#30BF69', '#95BF30', '#BF4E30', '#30B0BF', '#BF30B7', '#303DBF', '#30BF98' ],
-                        borderColor: foregroundColor
-                    }
-                ]
-            }
-        }
-    );
-*/
 });

@@ -366,8 +366,8 @@ const fetchCategories = async () => GET('/api/groups')
 const selectReader = () => {
     selectedReader = parseInt($('#sumup-reader-select').value);
     let active = selectedReader !== 0;
-    $('#transaction-cancel-btn').disabled = active;
-    $('#purchase-card').disabled = active;
+    $('#transaction-cancel-btn').disabled = !active;
+    $('#purchase-card').disabled = !active;
 }
 
 const connectWs = () => {

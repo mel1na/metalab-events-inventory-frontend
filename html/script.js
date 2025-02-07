@@ -319,7 +319,7 @@ const addPurchase = async (paymentType) => {
     });
 
     if (paymentType === 'card') {
-        promise = promise.then(r => pendingTransaction = r.id);
+        promise = promise.then(r => { pendingTransaction = r.client_transaction_id; return r; });
         $('#transaction-processing').showModal();
     } else clearInput();
 
@@ -412,6 +412,7 @@ const connectWs = () => {
     ws.addEventListener('error', e => {
         ws = undefined;
         $('#ws-disconnect').showModal();
+        $('#transaction-processing').close();
         if (!wsConnectPending) {
             wsConnectPending = true;
             setTimeout(connectWs, 1000);
@@ -421,6 +422,7 @@ const connectWs = () => {
     ws.addEventListener('close', e => {
         ws = undefined;
         $('#ws-disconnect').showModal();
+        $('#transaction-processing').close();
         if (!wsConnectPending) {
             wsConnectPending = true;
             setTimeout(connectWs, 1000);

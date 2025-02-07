@@ -298,17 +298,17 @@ const addPurchase = async (paymentType) => {
     let tip = roundUp && subtotal % 100
         ? 100 - (subtotal % 100)
         : undefined;
-    let items = [];
+    let orderItems = [];
     order.forEach(item => {
         if (item.id === 0)
             tip += item.amount * item.price;
-        else items.push({ id: item.id, quantity: item.amount })
+        else orderItems.push({ id: item.id, quantity: item.amount })
     });
-    if (items.length === 0 && tip <= 0)
+    if (orderItems.length === 0 && tip <= 0)
         return;
 
     let promise = POST('/api/purchases', {
-        items: items,
+        items: orderItems,
         tip: tip,
         payment_type: paymentType,
         reader_id: readers[selectedReader]?.id,

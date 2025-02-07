@@ -34,8 +34,8 @@ let currentInput = '';
 let selection = -1;
 let selectedReader = 0;
 
-let pendingTransaction;
-let lastKnownTransactionStatus;
+let pendingTransaction = null;
+let lastKnownTransactionStatus = null;
 
 
 const GET = async (path) => fetch(`${baseURL}${path}`, {
@@ -322,7 +322,7 @@ const addPurchase = async (paymentType) => {
         promise = promise.then(r => {
             if (lastKnownTransactionStatus
                     && lastKnownTransactionStatus.client_transaction_id == r.client_transaction_id) {
-                switch (data.transaction_status) {
+                switch (lastKnownTransactionStatus.transaction_status) {
                     case 'cancelled', 'failed':
                         $('#transaction-failed').showModal();
                         $('#transaction-processing').close();
@@ -335,6 +335,7 @@ const addPurchase = async (paymentType) => {
                     default:
                         break;
                 }
+                lastKnownTransactionStatus = null;
             } else pendingTransaction = r.client_transaction_id;
             return r;
         });

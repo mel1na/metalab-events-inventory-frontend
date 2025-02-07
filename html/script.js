@@ -319,7 +319,25 @@ const addPurchase = async (paymentType) => {
     });
 
     if (paymentType === 'card') {
-        promise = promise.then(r => { pendingTransaction = r.client_transaction_id; return r; });
+        promise = promise.then(r => {
+            if (lastKnownTransactionStatus
+                    && lastKnownTransactionStatus.client_transaction_id == r.client_transaction_id) {
+                switch (data.transaction_status) {
+                    case 'cancelled', 'failed':
+                        $('#transaction-failed').showModal();
+                        $('#transaction-processing').close();
+                        break;
+                    case 'successful':
+                        clearInput();
+                        $('#transaction-processing').close();
+                        break;
+                    case 'pending':
+                    default:
+                        break;
+                }
+            } else pendingTransaction = r.client_transaction_id;
+            return r;
+        });
         $('#transaction-processing').showModal();
     } else clearInput();
 

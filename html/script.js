@@ -400,6 +400,9 @@ const connectWs = () => {
     ws.addEventListener('message', e => {
         let data = JSON.parse(e.data);
 
+        if (!data.client_transaction_id)
+            return;
+
         if (!pendingTransaction) {
             lastKnownTransactionStatus = data;
             return;

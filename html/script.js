@@ -4,6 +4,8 @@ const baseURL = document.location.protocol === 'file:' || document.location.host
     : 'https://pos.metarave.jetzt';
 const foregroundColor = '#ffefef';
 
+let gitHash = '[indev]';
+
 let auth = undefined;
 
 let statisticsChart;
@@ -340,6 +342,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             $('#auth-prompt').showModal();
         } else onLogin();
     })
+
+    $('#version-display').innerText = `Version: ${gitHash}`;
     
     /* $-disable-statistics
     Chart.register(ChartDataLabels);

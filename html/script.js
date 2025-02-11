@@ -304,9 +304,10 @@ const addPurchase = async (paymentType) => {
         : undefined;
     let orderItems = [];
     order.forEach(item => {
-        if (item.id === 0)
+        if (item.id === 0) {
+            tip ??= 0;
             tip += item.amount * item.price;
-        else orderItems.push({ id: item.id, quantity: item.amount })
+        } else orderItems.push({ id: item.id, quantity: item.amount })
     });
     if (orderItems.length === 0 && tip <= 0)
         return;

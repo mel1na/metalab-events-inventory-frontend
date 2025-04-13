@@ -43,10 +43,12 @@ jobs:
         with:
           cosign-release: 'v2.2.4'
 
-      # Appends the PR/commit hash to the script.js file.
+      # Appends the short PR/commit hash to the script.js file.
       # Available in code as gitHash
-      - name: Write commit hash to script.js file
-        run: echo "gitHash = '$GITHUB_SHA';" >> $GITHUB_WORKSPACE/html/script.js
+      - name: Write short commit hash to script.js file
+        run: |
+          GITHUB_SHA_SHORT="${GITHUB_SHA:0:7}"
+          echo "gitHash = '$GITHUB_SHA_SHORT';" >> $GITHUB_WORKSPACE/html/script.js
 
       # Set up BuildKit Docker container builder to be able to build
       # multi-platform images and export cache

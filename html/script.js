@@ -13,6 +13,7 @@ const foregroundColor = '#ffefef';
 
 let ws;
 let wsConnectPending = false;
+let wsHeartbeatActive = false;
 
 let gitHash = '[indev]';
 let rawAuth = undefined;
@@ -451,6 +452,19 @@ const connectWs = () => {
             setTimeout(connectWs, 1000);
         }
     });
+}
+
+const wsHeartbeat = (init = true) => {
+    if (init) {
+        if (wsHeartbeatActive)
+            return;
+        wsHeartbeatActive = true;
+    }
+    setTimeout(() => {
+        if (ws !== undefined)
+            ws.send('{"type":"heartbeat"}');
+        wsHeartbeat();
+    }, 10_000 /* ms */);
 }
 
 const cancelTransaction = () => {

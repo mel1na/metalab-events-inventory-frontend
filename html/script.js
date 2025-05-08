@@ -464,7 +464,7 @@ const wsHeartbeat = (init = true) => {
         if (ws !== undefined)
             ws.send('{"type":"heartbeat"}');
         wsHeartbeat(false);
-    }, 10_000 /* ms */);
+    }, 30_000 /* ms */);
 }
 
 const cancelTransaction = () => {
@@ -486,5 +486,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else onLogin();
     });
 
+    wsHeartbeat();
     $('#version-display').innerText = `Version: ${gitHash}`;
 });

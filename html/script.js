@@ -463,7 +463,7 @@ const wsHeartbeat = (init = true) => {
     setTimeout(() => {
         if (ws !== undefined)
             ws.send('{"type":"heartbeat"}');
-        wsHeartbeat();
+        wsHeartbeat(false);
     }, 10_000 /* ms */);
 }
 

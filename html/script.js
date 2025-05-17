@@ -171,7 +171,7 @@ const pos = () => {
         return;
     }
 
-    if (order.length > 0 && (order[order.length - 1].amount === 1 || selection !== -1) && !currentInput.includes('.'))
+    if (order.length > 0 && /*(order[order.length - 1].amount === 1 ||*/ selection !== -1/*)*/ && !currentInput.includes('.'))
         order[selection !== -1 ? selection : order.length - 1].amount = parseInt(currentInput);
     else {
         let parts = currentInput.split('.', 2)
